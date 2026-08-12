@@ -1,0 +1,148 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- App models -------------------------------------------------------
+// The User/Session/Account/Verification models Better Auth needs are NOT
+// written here by hand. Once Better Auth is installed and configured,
+// run `npx @better-auth/cli@latest generate` and it will append those
+// models to this same file for you. After that, add one line to the
+// generated User model:
+//
+//   predictions Prediction[]
+//
+// That's the only manual step — it wires the relation below to the
+// User model Better Auth creates, since its generator only knows about
+// its own tables, not yours.
+
+model Team {
+  id           String @id @default(cuid())
+  abbreviation String @unique // e.g. "KC"
+  name         String // e.g. "Kansas City Chiefs"
+  conference   String // "AFC" | "NFC"
+  division     String // e.g. "West"
+
+  homeGames   Game[]       @relation("HomeTeam")
+  awayGames   Game[]       @relation("AwayTeam")
+  predictions Prediction[]
+
+  @@map("team")
+}
+
+enum GameStatus {
+  SCHEDULED
+  FINAL
+  CANCELLED
+}
+
+model Game {
+  id         String     @id @default(cuid())
+  externalId String     @unique // id from whichever NFL data API we sync from
+  season     Int
+  week       Int
+  kickoffAt  DateTime
+  status     GameStatus @default(SCHEDULED)
+
+  homeTeamId String
+  awayTeamId String
+  homeTeam   Team   @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam   Team   @relation("AwayTeam", fields: [awayTeamId], references: [id])
+
+  // Null until the game is FINAL
+  homeScore Int?
+  awayScore Int?
+
+  predictions Prediction[]
+
+  @@index([season, week])
+  @@map("game")
+}
+
+model Prediction {
+  id           String   @id @default(cuid())
+  userId       String
+  gameId       String
+  pickedTeamId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // References the User model Better Auth will generate into this file —
+  // see the note at the top.
+  // user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game       Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  pickedTeam Team @relation(fields: [pickedTeamId], references: [id])
+
+  // One pick per user per game — this is what makes "save a prediction"
+  // an upsert instead of risking duplicate rows.
+  @@unique([userId, gameId])
+  @@map("prediction")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
