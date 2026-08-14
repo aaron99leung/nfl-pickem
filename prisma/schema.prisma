@@ -74,12 +74,12 @@ model Prediction {
 
   // References the User model Better Auth will generate into this file —
   // see the note at the top.
-  // user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
   game       Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
   pickedTeam Team @relation(fields: [pickedTeamId], references: [id])
 
   // One pick per user per game — this is what makes "save a prediction"
-  // an upsert instead of risking duplicate rows.
+  // an upsert instead of duplicate rows.
   @@unique([userId, gameId])
   @@map("prediction")
 }
@@ -94,6 +94,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  predictions   Prediction[]
 
   @@unique([email])
   @@map("user")
