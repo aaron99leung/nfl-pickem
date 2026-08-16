@@ -1,13 +1,5 @@
-// Location in your project: src/lib/stats.ts
-//
-// Deliberately pure — no Prisma, no database, no async. Takes a plain
-// array in, returns a plain object out. This is what makes it trivial
-// to unit test: no setup, no mocking, just input -> expected output.
-//
 // Ties and cancelled games are never passed into this function at all —
-// they're filtered out one layer up, before this function ever sees them.
-// As far as this function is concerned, "graded results" only ever means
-// clearly right or clearly wrong.
+// they're filtered out one layer up, before this function ever sees them
 
 export type GradedPick = {
   correct: boolean;
