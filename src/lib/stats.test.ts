@@ -1,9 +1,3 @@
-// Location in your project: src/lib/stats.test.ts
-//
-// Vitest automatically finds any file ending in .test.ts — no manual
-// registration needed. This sits right next to stats.ts on purpose,
-// a common convention: the test lives beside the code it's testing.
-
 import { describe, it, expect } from "vitest";
 import { computeStats } from "./stats";
 
@@ -38,8 +32,7 @@ describe("computeStats", () => {
     expect(computeStats(results).currentStreak).toBe(0);
   });
 
-  // The exact scenario walked through earlier: a strong run in the middle
-  // of the history, then a miss, then only one correct pick since.
+  // A strong run in the middle of the history, then a miss, then only one correct pick since.
   it("distinguishes current streak from longest streak", () => {
     const results = [
       { correct: true },

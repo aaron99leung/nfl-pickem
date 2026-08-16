@@ -16,7 +16,6 @@ export function computeStats(results: GradedPick[]): Stats {
     return { currentStreak: 0, longestStreak: 0, accuracy: 0 };
   }
 
-  // --- Longest streak: scan front to back, track a running counter ---
   let longestStreak = 0;
   let runningStreak = 0;
 
