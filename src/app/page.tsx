@@ -4,7 +4,7 @@ import { UpcomingGames } from "@/components/UpcomingGames";
 export default function Home() {
   return (
     <div className="flex flex-col gap-10">
-      <section className="flex flex-col items-center gap-4 bg-gradient-to-r from-blue-700 to-red-700 px-4 py-24 text-center text-white">
+      <section className="flex flex-col items-center gap-4 px-4 py-24 text-center text-white">
         <h1 className="text-4xl font-bold">NFL Pick&apos;em</h1>
         <p className="text-lg">
           Make your picks. Build your streak. Beat your friends.

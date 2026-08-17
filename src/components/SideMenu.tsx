@@ -17,18 +17,16 @@ export function SideMenu({
   open: boolean;
   onClose: () => void;
 }) {
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* Clicking the dimmed backdrop closes the menu, same as clicking outside it */}
-      <button
-        aria-label="Close menu"
-        onClick={onClose}
-        className="flex-1 bg-black/50"
-      />
-
-      <nav className="w-64 bg-white p-4">
+    <div
+      aria-hidden={!open}
+      className={`fixed inset-0 z-50 flex ${open ? "" : "pointer-events-none"}`}
+    >
+      <nav
+        className={`w-64 bg-white p-4 transition-transform duration-300 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <button onClick={onClose} className="mb-4 border px-3 py-1">
           Close
         </button>
@@ -43,6 +41,14 @@ export function SideMenu({
           ))}
         </ul>
       </nav>
+
+      <button
+        aria-label="Close menu"
+        onClick={onClose}
+        className={`flex-1 bg-black/50 transition-opacity duration-300 ${
+          open ? "opacity-100" : "opacity-0"
+        }`}
+      />
     </div>
   );
 }
