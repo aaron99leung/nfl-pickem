@@ -4,7 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faUserPen } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHouse,
+  faUserPen,
+  faPersonThroughWindow,
+} from "@fortawesome/free-solid-svg-icons";
 import { authClient } from "@/lib/auth-client";
 import { SideMenu } from "@/components/SideMenu";
 
@@ -14,21 +18,38 @@ export function Header() {
 
   return (
     <header className="flex items-center justify-between border-b p-4">
-      <div className="flex items-center gap-3">
-        <button aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+      <div className="flex items-center gap-4">
+        <button
+          aria-label="Open menu"
+          onClick={() => setMenuOpen(true)}
+          className="rounded p-2 hover:bg-white/10"
+        >
           <Menu />
         </button>
 
-        <Link href="/" aria-label="Home">
+        <Link href="/" aria-label="Home" className="rounded p-2 hover:bg-white/10">
           <FontAwesomeIcon icon={faHouse} />
         </Link>
       </div>
 
       <div>
         {isPending ? null : session ? (
-          <Link href="/profile" aria-label="Your profile">
-            <FontAwesomeIcon icon={faUserPen} />
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/profile"
+              aria-label="Your profile"
+              className="rounded p-2 hover:bg-white/10"
+            >
+              <FontAwesomeIcon icon={faUserPen} />
+            </Link>
+            <button
+              onClick={() => authClient.signOut()}
+              aria-label="Log out"
+              className="rounded p-2 text-red-500 hover:bg-white/10"
+            >
+              <FontAwesomeIcon icon={faPersonThroughWindow} />
+            </button>
+          </div>
         ) : (
           <div className="flex gap-2">
             <Link

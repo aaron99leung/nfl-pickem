@@ -5,14 +5,14 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-10">
       <section className="flex min-h-screen flex-col items-center justify-center px-6 relative overflow-hidden">
-        <h1 className="text-4xl font-bold">NFL Pick&apos;em</h1>
+        <h1 className="text-4xl font-bold">Hail Mary</h1>
         <p className="text-lg">
-          Make your picks. Build your streak. Beat your friends.
+          Pick 6, Scrimmage, Hail Mary, End Zone, Touchdown
         </p>
       </section>
 
       <section className="flex flex-col gap-2 px-4 pb-4">
-        <h2 className="text-xl">Next 3 upcoming games</h2>
+        <h2 className="text-xl">Upcoming games</h2>
         <UpcomingGames />
       </section>
 
