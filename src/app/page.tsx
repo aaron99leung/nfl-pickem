@@ -3,16 +3,27 @@ import { UpcomingGames } from "@/components/UpcomingGames";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-10 p-4">
-      <section className="flex flex-col gap-3">
-        <h1 className="text-3xl">NFL Pick&apos;em</h1>
+    <div className="flex flex-col gap-10">
+      <section className="flex flex-col items-center gap-4 bg-gradient-to-r from-blue-700 to-red-700 px-4 py-24 text-center text-white">
+        <h1 className="text-4xl font-bold">NFL Pick&apos;em</h1>
+        <p className="text-lg">
+          Make your picks. Build your streak. Beat your friends.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-2 px-4 pb-4">
+        <h2 className="text-xl">Next 3 upcoming games</h2>
+        <UpcomingGames />
+      </section>
+
+      <section className="flex flex-col gap-3 px-4">
         <p>Pick a winner for every NFL game, and see how you stack up.</p>
         <Link href="/games" className="w-fit border px-4 py-2">
-          View this week&apos;s games
+          This Season&apos;s Schedule
         </Link>
       </section>
 
-      <section className="flex flex-col gap-2">
+      <section className="flex flex-col gap-2 px-4">
         <h2 className="text-xl">Streaks &amp; predictions</h2>
         <p>
           Pick the winner of each game before kickoff. Correct picks build
@@ -21,7 +32,7 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="flex flex-col gap-2">
+      <section className="flex flex-col gap-2 px-4">
         <h2 className="text-xl">Compete with friends</h2>
         <p>
           Every user&apos;s streaks and accuracy are public on the{" "}
@@ -30,11 +41,6 @@ export default function Home() {
           </Link>
           , so you can see where you rank.
         </p>
-      </section>
-
-      <section className="flex flex-col gap-2">
-        <h2 className="text-xl">Next 3 upcoming games</h2>
-        <UpcomingGames />
       </section>
     </div>
   );

@@ -1,5 +1,3 @@
-// Shapes returned by the existing API routes, shared across frontend components.
-
 export interface Team {
   abbreviation: string;
   name: string;
