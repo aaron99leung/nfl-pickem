@@ -24,7 +24,16 @@ export default function TeamSchedulePage({
       <h1 className="text-2xl">{abbreviation} Schedule</h1>
 
       {!games ? (
-        <p>Loading...</p>
+        <ul className="flex flex-col gap-3">
+          {Array.from({ length: 6 }, (_, i) => (
+            <li key={i} className="flex flex-col gap-2 border p-3">
+              <div className="skeleton h-4 w-1/2"></div>
+              <div className="skeleton h-4 w-1/3"></div>
+              <div className="skeleton h-4 w-1/4"></div>
+              <div className="skeleton h-4 w-1/2"></div>
+            </li>
+          ))}
+        </ul>
       ) : (
         <ul className="flex flex-col gap-3">
           {games.map((game) => (

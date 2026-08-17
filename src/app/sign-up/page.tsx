@@ -12,13 +12,16 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const { error } = await authClient.signUp.email({ name, email, password });
     if (error) {
+      setLoading(false);
       setError(error.message ?? "Something went wrong.");
       return;
     }
@@ -77,9 +80,14 @@ export default function SignUpPage() {
 
           <button
             type="submit"
+            disabled={loading}
             className="rounded border bg-white p-2 text-black transition-colors duration-300 hover:bg-green-600"
           >
-            Sign up
+            {loading ? (
+              <span className="loading loading-infinity loading-xl"></span>
+            ) : (
+              "Sign up"
+            )}
           </button>
         </form>
 

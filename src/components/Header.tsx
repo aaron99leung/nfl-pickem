@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, Goal, UserCircle } from "lucide-react";
+import { Menu } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse, faUserPen } from "@fortawesome/free-solid-svg-icons";
 import { authClient } from "@/lib/auth-client";
 import { SideMenu } from "@/components/SideMenu";
 
@@ -17,23 +19,28 @@ export function Header() {
           <Menu />
         </button>
 
-        <Link href="/" className="flex items-center gap-2">
-          <Goal />
-          <span>NFL Pick&apos;em</span>
+        <Link href="/" aria-label="Home">
+          <FontAwesomeIcon icon={faHouse} />
         </Link>
       </div>
 
       <div>
         {isPending ? null : session ? (
           <Link href="/profile" aria-label="Your profile">
-            <UserCircle />
+            <FontAwesomeIcon icon={faUserPen} />
           </Link>
         ) : (
           <div className="flex gap-2">
-            <Link href="/sign-in" className="border px-3 py-1">
+            <Link
+              href="/sign-in"
+              className="rounded-2xl border border-blue-600 bg-blue-600 px-3 py-1 text-white"
+            >
               Log in
             </Link>
-            <Link href="/sign-up" className="border px-3 py-1">
+            <Link
+              href="/sign-up"
+              className="rounded-2xl border border-red-600 bg-red-600 px-3 py-1 text-white"
+            >
               Sign up
             </Link>
           </div>

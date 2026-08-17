@@ -39,7 +39,7 @@ export default function LeaderboardPage() {
       </div>
 
       {!entries ? (
-        <p>Loading...</p>
+        <span className="loading loading-infinity loading-xl"></span>
       ) : (
         <table className="border-collapse">
           <thead>

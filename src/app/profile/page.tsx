@@ -22,11 +22,15 @@ export default function ProfilePage() {
     <div className="flex flex-col gap-6 p-4">
       <h1 className="text-2xl">{session.user.name}</h1>
 
-      <div className="flex flex-col gap-1">
-        <p>Current streak: {stats?.currentStreak ?? "..."}</p>
-        <p>Longest streak: {stats?.longestStreak ?? "..."}</p>
-        <p>Accuracy: {stats?.accuracy ?? "..."}</p>
-      </div>
+      {!stats ? (
+        <span className="loading loading-infinity loading-xl"></span>
+      ) : (
+        <div className="flex flex-col gap-1">
+          <p>Current streak: {stats.currentStreak}</p>
+          <p>Longest streak: {stats.longestStreak}</p>
+          <p>Accuracy: {stats.accuracy}</p>
+        </div>
+      )}
 
       {/* Keyed by user id so the form's local state re-initialises from the
           session if the signed-in user ever changes. */}
@@ -49,11 +53,14 @@ function FavouritesForm({
   const [favouriteTeam, setFavouriteTeam] = useState(initialFavouriteTeam);
   const [favouritePlayer, setFavouritePlayer] = useState(initialFavouritePlayer);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaved(false);
+    setSaving(true);
     await authClient.updateUser({ favouriteTeam, favouritePlayer });
+    setSaving(false);
     setSaved(true);
   }
 
@@ -79,8 +86,12 @@ function FavouritesForm({
         />
       </label>
 
-      <button type="submit" className="border p-2 w-fit">
-        Save
+      <button type="submit" disabled={saving} className="border p-2 w-fit">
+        {saving ? (
+          <span className="loading loading-infinity loading-xl"></span>
+        ) : (
+          "Save"
+        )}
       </button>
 
       {saved && <p>Saved.</p>}
