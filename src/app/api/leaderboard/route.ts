@@ -7,10 +7,7 @@ const VALID_SORT_FIELDS = ["currentStreak", "longestStreak", "accuracy"] as cons
 type SortField = (typeof VALID_SORT_FIELDS)[number];
 
 // GET /api/leaderboard?sortBy=currentStreak (default) | longestStreak | accuracy
-//
-// Deliberately no auth check here — this is intentionally public data,
-// unlike /api/predictions or /api/stats which are about one specific
-// user's own information.
+// Deliberately no auth check here — this is intentionally public data
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const sortByParam = searchParams.get("sortBy") ?? "currentStreak";
@@ -25,8 +22,7 @@ export async function GET(req: NextRequest) {
 
   const users = await prisma.user.findMany();
 
-  // Reusing the exact same computeStats function tested with Vitest —
-  // just called once per user instead of once for "me".
+  // Reusing the exact same computeStats function, calling once per user
   const leaderboard = await Promise.all(
     users.map(async (user) => {
       const gradedPicks = await getGradedPicksForUser(user.id);
