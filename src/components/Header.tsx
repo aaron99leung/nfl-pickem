@@ -31,7 +31,7 @@ export function Header() {
         ) : (
           <div className="flex gap-2">
             <Link href="/sign-in" className="border px-3 py-1">
-              Sign in
+              Log in
             </Link>
             <Link href="/sign-up" className="border px-3 py-1">
               Sign up
