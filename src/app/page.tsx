@@ -1,46 +1,50 @@
 import Link from "next/link";
 import { UpcomingGames } from "@/components/UpcomingGames";
+import { HeroParticles } from "@/components/HeroParticles";
 
 export default function Home() {
   return (
     <div className="flex flex-col gap-10">
       <section className="flex min-h-screen flex-col items-center justify-center px-6 relative overflow-hidden">
-        <h1 className="text-4xl font-bold">Hail Mary</h1>
-        <p className="text-lg">
+        <HeroParticles />
+        <h1 className="relative z-10 text-4xl font-bold">Hail Mary</h1>
+        <p className="relative z-10 text-lg">
           Pick 6, Scrimmage, Hail Mary, End Zone, Touchdown
         </p>
       </section>
 
-      <section className="flex flex-col gap-2 px-4 pb-4">
+      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-2 px-4">
         <h2 className="text-xl">Upcoming games</h2>
         <UpcomingGames />
       </section>
 
-      <section className="flex flex-col gap-3 px-4">
+      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-3 px-4">
         <p>Pick a winner for every NFL game, and see how you stack up.</p>
         <Link href="/games" className="w-fit border px-4 py-2">
           This Season&apos;s Schedule
         </Link>
       </section>
 
-      <section className="flex flex-col gap-2 px-4">
-        <h2 className="text-xl">Streaks &amp; predictions</h2>
-        <p>
-          Pick the winner of each game before kickoff. Correct picks build
-          your current streak — your longest streak and overall accuracy are
-          tracked across the whole season.
-        </p>
-      </section>
+      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-10 px-4">
+        <div className="flex w-full max-w-xl flex-col gap-2">
+          <h2 className="text-xl">Streaks &amp; predictions</h2>
+          <p>
+            Pick the winner of each game before kickoff. Correct picks build
+            your current streak — your longest streak and overall accuracy are
+            tracked across the whole season.
+          </p>
+        </div>
 
-      <section className="flex flex-col gap-2 px-4">
-        <h2 className="text-xl">Compete with friends</h2>
-        <p>
-          Every user&apos;s streaks and accuracy are public on the{" "}
-          <Link href="/leaderboard" className="underline">
-            leaderboard
-          </Link>
-          , so you can see where you rank.
-        </p>
+        <div className="flex w-full max-w-xl flex-col gap-2">
+          <h2 className="text-xl">Compete with friends</h2>
+          <p>
+            Every user&apos;s streaks and accuracy are public on the{" "}
+            <Link href="/leaderboard" className="underline">
+              leaderboard
+            </Link>
+            , so you can see where you rank.
+          </p>
+        </div>
       </section>
     </div>
   );

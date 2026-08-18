@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NFL Pick'em",
-  description: "Track your NFL predictions and compete with friends.",
+  title: "Hail Mary: NFL Pick'em",
+  description: "Track your NFL predictions and rank up",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

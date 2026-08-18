@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, LogIn, UserPlus } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHouse,
@@ -17,7 +17,7 @@ export function Header() {
   const { data: session, isPending } = authClient.useSession();
 
   return (
-    <header className="flex items-center justify-between border-b p-4">
+    <header className="flex items-center justify-between border-b border-[#000000] bg-black p-4">
       <div className="flex items-center gap-4">
         <button
           aria-label="Open menu"
@@ -51,17 +51,19 @@ export function Header() {
             </button>
           </div>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex items-center gap-4">
             <Link
               href="/sign-in"
-              className="rounded-2xl border border-blue-600 bg-blue-600 px-3 py-1 text-white"
+              className="flex items-center gap-1.5 rounded p-2 text-white text-sm hover:bg-white/10"
             >
+              <LogIn />
               Log in
             </Link>
             <Link
               href="/sign-up"
-              className="rounded-2xl border border-red-600 bg-red-600 px-3 py-1 text-white"
+              className="flex items-center gap-1.5 rounded p-2 text-white text-sm hover:bg-white/10"
             >
+              <UserPlus />
               Sign up
             </Link>
           </div>
