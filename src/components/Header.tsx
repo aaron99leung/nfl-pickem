@@ -10,11 +10,19 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { authClient } from "@/lib/auth-client";
 import { SideMenu } from "@/components/SideMenu";
+import { AuthModal } from "@/components/AuthModal";
 import { betrayed } from "@/lib/fonts";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authTab, setAuthTab] = useState<"login" | "signup">("login");
   const { data: session, isPending } = authClient.useSession();
+
+  function openAuth(tab: "login" | "signup") {
+    setAuthTab(tab);
+    setAuthOpen(true);
+  }
 
   return (
     <header className="relative z-[20] flex items-center justify-between border-b border-[#000000] bg-black px-4 py-1">
@@ -56,25 +64,26 @@ export function Header() {
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <Link
-              href="/sign-in"
+            <button
+              onClick={() => openAuth("login")}
               className="flex items-center gap-1.5 rounded p-2 text-white text-sm hover:bg-white/10"
             >
               <LogIn />
               Log in
-            </Link>
-            <Link
-              href="/sign-up"
+            </button>
+            <button
+              onClick={() => openAuth("signup")}
               className="flex items-center gap-1.5 rounded p-2 text-white text-sm hover:bg-white/10"
             >
               <UserPlus />
               Sign up
-            </Link>
+            </button>
           </div>
         )}
       </div>
 
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <AuthModal key={authTab} open={authOpen} initialTab={authTab} onClose={() => setAuthOpen(false)} />
     </header>
   );
 }

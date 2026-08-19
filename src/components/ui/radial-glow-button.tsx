@@ -1,15 +1,25 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export interface RadialGlowButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+type RadialGlowButtonAsButton = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children?: React.ReactNode;
-}
+  href?: undefined;
+};
+
+type RadialGlowButtonAsLink = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  children?: React.ReactNode;
+  href: string;
+};
+
+export type RadialGlowButtonProps = RadialGlowButtonAsButton | RadialGlowButtonAsLink;
 
 export function RadialGlowButton({
   children = "Get Extension",
   className,
+  href,
   ...props
 }: RadialGlowButtonProps) {
   return (
@@ -48,6 +58,9 @@ export function RadialGlowButton({
           );
           
           position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           min-width: 160px;
           min-height: 51px;
           padding: 16px 24px;
@@ -60,6 +73,7 @@ export function RadialGlowButton({
           color: rgba(255, 255, 255, 0.95);
           background: var(--bg);
           cursor: pointer;
+          text-decoration: none;
           text-shadow: 0 0 2px rgba(0, 0, 0, 0.95);
           overflow: hidden;
           -webkit-font-smoothing: antialiased;
@@ -162,13 +176,23 @@ export function RadialGlowButton({
         }
       `}</style>
       
-      <button className={cn("rg-button", className)} type="button" {...props}>
-        <span className="rg-shine">
-          <span></span>
-        </span>
-        <span className="rg-bg"></span>
-        <span className="rg-label">{children}</span>
-      </button>
+      {href ? (
+        <Link href={href} className={cn("rg-button", className)} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+          <span className="rg-shine">
+            <span></span>
+          </span>
+          <span className="rg-bg"></span>
+          <span className="rg-label">{children}</span>
+        </Link>
+      ) : (
+        <button className={cn("rg-button", className)} type="button" {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}>
+          <span className="rg-shine">
+            <span></span>
+          </span>
+          <span className="rg-bg"></span>
+          <span className="rg-label">{children}</span>
+        </button>
+      )}
     </div>
   );
 }

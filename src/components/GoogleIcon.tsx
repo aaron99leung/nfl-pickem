@@ -1,6 +1,6 @@
-export function GoogleIcon() {
+export function GoogleIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 18 18" className="h-4 w-4" aria-hidden="true">
+    <svg viewBox="0 0 18 18" className={className} aria-hidden="true">
       <path
         fill="#4285F4"
         d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"

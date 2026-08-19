@@ -44,7 +44,7 @@ export interface SplitFlapTextProps extends HTMLAttributes<HTMLDivElement> {
   padTo?: number;
 }
 
-const DEFAULT_WORDS = ["BALL SEASON", "GAME READY", "WEEK LOCKED", "KICKOFF SET"];
+const DEFAULT_WORDS = ["BALL SEASON", "SUNDAY GAME", "PICKS LOCKED", "KICKOFF SET"];
 
 const CHARSETS: Record<string, string> = {
   alpha: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
