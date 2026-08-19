@@ -7,6 +7,7 @@ export interface Team {
 
 export interface Game {
   id: string;
+  week: number;
   kickoffAt: string;
   status: "SCHEDULED" | "FINAL" | "CANCELLED";
   homeScore: number | null;

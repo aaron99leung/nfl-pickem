@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import type { Game } from "@/lib/types";
 
+const MARQUEE_GAME_COUNT = 10;
+
 export function UpcomingGames() {
   const [games, setGames] = useState<Game[] | null>(null);
 
@@ -13,23 +15,24 @@ export function UpcomingGames() {
         const upcoming = allGames.filter(
           (game) => new Date(game.kickoffAt) > new Date()
         );
-        setGames(upcoming.slice(0, 3));
+        setGames(upcoming.slice(0, MARQUEE_GAME_COUNT));
       });
   }, []);
 
   if (!games) return <p>Loading...</p>;
   if (games.length === 0) return <p>No upcoming games.</p>;
 
+  const track = [...games, ...games];
+
   return (
-    <ul className="flex flex-col gap-3">
-      {games.map((game) => (
-        <li key={game.id} className="border p-3">
-          <p>
-            {game.awayTeam.abbreviation} @ {game.homeTeam.abbreviation}
-          </p>
-          <p>{new Date(game.kickoffAt).toLocaleString()}</p>
-        </li>
-      ))}
-    </ul>
+    <div className="w-full overflow-hidden border-y border-white/20 bg-zinc-900 py-3">
+      <div className="animate-marquee flex w-max gap-10">
+        {track.map((game, i) => (
+          <span key={`${game.id}-${i}`} className="whitespace-nowrap text-sm">
+            {`${game.awayTeam.abbreviation} @ ${game.homeTeam.abbreviation} W${game.week}, ${new Date(game.kickoffAt).toLocaleDateString()}`}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }

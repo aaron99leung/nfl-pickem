@@ -18,7 +18,7 @@ function LinkedinIcon() {
 
 export function Footer() {
   return (
-<footer className="bg-black text-gray-400 py-6 px-6">
+<footer className="relative z-20 bg-black text-gray-400 py-6 px-6">
         <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
           <span className="text-gray-300 font-medium">Aaron Leung</span>
           <div className="flex items-center gap-5">

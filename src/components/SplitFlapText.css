@@ -1,0 +1,114 @@
+.split-flap-text {
+  display: inline-flex;
+  gap: var(--split-flap-gap, 6px);
+}
+
+.split-flap-text__tile {
+  position: relative;
+  width: 0.72em;
+  height: 1.15em;
+  font-size: var(--split-flap-font-size, 52px);
+  line-height: 1;
+  perspective: 300px;
+}
+
+.split-flap-text__half,
+.split-flap-text__flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  background: var(--split-flap-tile-color, #111827);
+}
+
+.split-flap-text__char {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--split-flap-text-color, #f8fafc);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.split-flap-text__half--top,
+.split-flap-text__flap--front {
+  top: 0;
+  border-top-left-radius: var(--split-flap-radius, 8px);
+  border-top-right-radius: var(--split-flap-radius, 8px);
+}
+
+.split-flap-text__half--top .split-flap-text__char,
+.split-flap-text__flap--front .split-flap-text__char {
+  top: 0;
+}
+
+.split-flap-text__half--bottom,
+.split-flap-text__flap--back {
+  bottom: 0;
+  border-bottom-left-radius: var(--split-flap-radius, 8px);
+  border-bottom-right-radius: var(--split-flap-radius, 8px);
+}
+
+.split-flap-text__half--bottom .split-flap-text__char,
+.split-flap-text__flap--back .split-flap-text__char {
+  bottom: 0;
+}
+
+/* Hinge line across the middle of the tile, matching a real flip display. */
+.split-flap-text__half--top::after,
+.split-flap-text__flap--front::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.split-flap-text__flap {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  z-index: 2;
+}
+
+/* One flip step is split in half: the front flap rotates down and out of
+   view first, then the back flap rotates the rest of the way in — matching
+   the timing of a single character swap in the JS animation loop. */
+.split-flap-text__flap--front {
+  transform-origin: bottom;
+  animation: split-flap-flip-front calc(var(--split-flap-flip-duration, 0.12s) * 0.5) linear forwards;
+}
+
+.split-flap-text__flap--back {
+  transform-origin: top;
+  transform: rotateX(90deg);
+  animation: split-flap-flip-back calc(var(--split-flap-flip-duration, 0.12s) * 0.5) linear forwards;
+  animation-delay: calc(var(--split-flap-flip-duration, 0.12s) * 0.5);
+}
+
+@keyframes split-flap-flip-front {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes split-flap-flip-back {
+  from {
+    transform: rotateX(90deg);
+  }
+  to {
+    transform: rotateX(0deg);
+  }
+}

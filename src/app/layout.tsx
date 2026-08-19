@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { clashGrotesk } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -16,14 +13,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Hail Mary: NFL Pick'em",
-  description: "Track your NFL predictions and rank up",
+  description: "Track NFL predictions and rank up",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={cn("dark", "h-full", "antialiased", clashGrotesk.variable, geistMono.variable)}
     >
       <body className="flex min-h-full flex-col bg-black">
         <Header />

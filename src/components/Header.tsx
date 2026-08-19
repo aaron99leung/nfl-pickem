@@ -5,19 +5,19 @@ import Link from "next/link";
 import { Menu, LogIn, UserPlus } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faHouse,
   faUserPen,
   faPersonThroughWindow,
 } from "@fortawesome/free-solid-svg-icons";
 import { authClient } from "@/lib/auth-client";
 import { SideMenu } from "@/components/SideMenu";
+import { betrayed } from "@/lib/fonts";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: session, isPending } = authClient.useSession();
 
   return (
-    <header className="flex items-center justify-between border-b border-[#000000] bg-black p-4">
+    <header className="relative z-[20] flex items-center justify-between border-b border-[#000000] bg-black px-4 py-1">
       <div className="flex items-center gap-4">
         <button
           aria-label="Open menu"
@@ -27,8 +27,12 @@ export function Header() {
           <Menu />
         </button>
 
-        <Link href="/" aria-label="Home" className="rounded p-2 hover:bg-white/10">
-          <FontAwesomeIcon icon={faHouse} />
+        <Link
+          href="/"
+          aria-label="Home"
+          className={`translate-y-[9px] rounded p-2 text-xl ${betrayed.className}`}
+        >
+          Hail Mary
         </Link>
       </div>
 
