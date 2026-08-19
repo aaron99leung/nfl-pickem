@@ -122,7 +122,7 @@ export function AppFeaturesBento() {
             </Reveal>
 
             <Reveal className="col-span-full sm:col-span-3 lg:col-span-2" delay={0.1}>
-            <Card className="relative overflow-hidden">
+            <Card className="relative flex h-full flex-col justify-center overflow-hidden">
               <CardContent className="pt-6">
                 <div className="relative mx-auto flex aspect-square size-32 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
                   <GoogleIcon className="m-auto h-12 w-12" />
@@ -136,7 +136,7 @@ export function AppFeaturesBento() {
             </Reveal>
 
             <Reveal className="col-span-full sm:col-span-3 lg:col-span-2" delay={0.2}>
-            <Card className="relative overflow-hidden">
+            <Card className="relative h-full overflow-hidden">
               <CardContent className="pt-6">
                 <div className="pt-6 lg:px-6">
                   <svg className="w-full" viewBox="0 0 386 123" fill="none" xmlns="http://www.w3.org/2000/svg">

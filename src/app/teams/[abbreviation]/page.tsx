@@ -2,6 +2,8 @@
 
 import { use, useEffect, useState } from "react";
 import type { Game } from "@/lib/types";
+import { GameBox } from "@/components/GameBox";
+import { Reveal } from "@/components/Reveal";
 
 const SEASON = 2026;
 
@@ -19,9 +21,19 @@ export default function TeamSchedulePage({
       .then(setGames);
   }, [abbreviation]);
 
+  const firstGame = games?.[0];
+  const teamName = firstGame
+    ? firstGame.homeTeam.abbreviation === abbreviation
+      ? firstGame.homeTeam.name
+      : firstGame.awayTeam.name
+    : abbreviation;
+
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <h1 className="text-2xl">{abbreviation} Schedule</h1>
+    <div className="flex flex-col gap-16 p-4">
+      <Reveal mode="mount">
+        <h1 className="text-center text-5xl font-semibold py-16">{abbreviation} Schedule</h1>
+        <p className="text-center text-lg text-white/70">Every game on the {teamName} schedule this season</p>
+      </Reveal>
 
       {!games ? (
         <ul className="flex flex-col gap-3">
@@ -35,23 +47,15 @@ export default function TeamSchedulePage({
           ))}
         </ul>
       ) : (
-        <ul className="flex flex-col gap-3">
-          {games.map((game) => (
-            <li key={game.id} className="border p-3">
-              <p>
-                {game.awayTeam.abbreviation} @ {game.homeTeam.abbreviation}
-              </p>
-              <p>
-                Score:{" "}
-                {game.status === "SCHEDULED"
-                  ? "TBD"
-                  : `${game.awayScore} - ${game.homeScore}`}
-              </p>
-              <p>Status: {game.status}</p>
-              <p>Kickoff: {new Date(game.kickoffAt).toLocaleString()}</p>
-            </li>
-          ))}
-        </ul>
+        <Reveal key={abbreviation} mode="mount">
+          <ul className="mx-auto flex w-full max-w-2xl flex-col gap-3">
+            {games.map((game) => (
+              <li key={game.id}>
+                <GameBox game={game} />
+              </li>
+            ))}
+          </ul>
+        </Reveal>
       )}
     </div>
   );
