@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import type { Stats } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
@@ -116,7 +117,7 @@ function WeeklyAccuracyChart({ games }: { games: PickHistoryGame[] }) {
   if (weekly.length === 0) {
     return (
       <div className="flex w-full flex-col gap-2 border-t border-white/10 pt-4">
-        <p className="text-center text-xs font-medium text-white/50">Weekly Accuracy Trend</p>
+        <p className="text-center text-xs font-medium text-white/50">Accuracy/Win Rate Trend (by week)</p>
         <p className="py-4 text-center text-sm text-white/40">No data available yet</p>
       </div>
     );
@@ -139,7 +140,7 @@ function WeeklyAccuracyChart({ games }: { games: PickHistoryGame[] }) {
 
   return (
     <div className="flex w-full flex-col gap-2 border-t border-white/10 pt-4">
-      <p className="text-center text-xs font-medium text-white/50">Weekly Accuracy Trend</p>
+      <p className="text-center text-xs font-medium text-white/50">Accuracy/Win Rate Trend (by week)</p>
       <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-32 w-full">
         <defs>
           <linearGradient id="weekly-accuracy-fill" x1="0" y1="0" x2="0" y2="1">
@@ -169,27 +170,6 @@ function WeeklyAccuracyChart({ games }: { games: PickHistoryGame[] }) {
         ))}
       </div>
     </div>
-  );
-}
-
-function WinRateSparkline({ games }: { games: PickHistoryGame[] }) {
-  const weekly = computeWeeklyAccuracy(games);
-  if (weekly.length < 2) {
-    return <p className="text-xs text-white/40">Not enough data yet</p>;
-  }
-
-  const width = 160;
-  const height = 48;
-  const points = weekly.map((entry, i) => ({
-    x: (i / (weekly.length - 1)) * width,
-    y: (1 - entry.accuracy) * height,
-  }));
-  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-12 w-full">
-      <path d={linePath} fill="none" stroke="#facc15" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
 
@@ -395,10 +375,6 @@ export default function ProfilePage() {
                     <span className="text-xs font-medium text-white/50">Incorrect Picks</span>
                     <span className="text-sm font-bold text-white">{incorrectCount}</span>
                   </div>
-                  <div className="flex w-full flex-col items-center gap-1 pt-1 text-center">
-                    <p className="text-xs font-medium text-white/50">Win Rate Trend</p>
-                    <WinRateSparkline games={pickHistory.games} />
-                  </div>
                 </div>
 
                 <div className="flex w-full justify-center">
@@ -412,6 +388,17 @@ export default function ProfilePage() {
 
           <div className="flex w-full flex-col gap-4 rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-6">
             <p className="text-center text-xs font-medium text-white/50">Pick History</p>
+            <p className="text-center text-xs text-white/40">
+              To see prediction results per game in detail, go to{" "}
+              <Link href="/teams" className="text-white/70 underline hover:text-white">
+                Team
+              </Link>{" "}
+              or{" "}
+              <Link href="/games" className="text-white/70 underline hover:text-white">
+                Game
+              </Link>{" "}
+              Schedule
+            </p>
             {!pickHistory ? (
               <div className="flex w-full flex-col gap-4">
                 <div className="grid grid-cols-[repeat(34,minmax(0,1fr))] gap-1">

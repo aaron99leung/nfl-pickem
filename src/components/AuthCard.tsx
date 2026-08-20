@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { GoogleIcon } from "@/components/GoogleIcon";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ export function AuthCard({ initialTab, onSuccess }: { initialTab: Tab; onSuccess
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -100,13 +102,23 @@ export function AuthCard({ initialTab, onSuccess }: { initialTab: Tab; onSuccess
 
         <label className="flex flex-col gap-1">
           Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="border rounded p-2"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full rounded border p-2 pr-9"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+            >
+              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </label>
 
         {error && <p className="text-red-600">{error}</p>}
