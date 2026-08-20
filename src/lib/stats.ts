@@ -45,3 +45,9 @@ export function computeStats(results: GradedPick[]): Stats {
 
   return { currentStreak, longestStreak, accuracy };
 }
+
+// Display-only helper — the API always returns accuracy as a raw 0-1 ratio;
+// this just formats it as a percentage for the UI.
+export function formatAccuracy(accuracy: number): string {
+  return `${Math.round(accuracy * 100)}%`;
+}

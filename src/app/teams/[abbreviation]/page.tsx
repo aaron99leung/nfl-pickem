@@ -1,9 +1,10 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import type { Game } from "@/lib/types";
+import type { Game, Prediction } from "@/lib/types";
 import { GameBox } from "@/components/GameBox";
 import { Reveal } from "@/components/Reveal";
+import { authClient } from "@/lib/auth-client";
 
 const SEASON = 2026;
 
@@ -14,12 +15,36 @@ export default function TeamSchedulePage({
 }) {
   const { abbreviation } = use(params);
   const [games, setGames] = useState<Game[] | null>(null);
+  const [pickedTeamByGameId, setPickedTeamByGameId] = useState<Record<string, string>>({});
+  const { data: session } = authClient.useSession();
+
+  const hasSession = !!session;
+  const [trackedHasSession, setTrackedHasSession] = useState(hasSession);
+  if (hasSession !== trackedHasSession) {
+    setTrackedHasSession(hasSession);
+    if (!hasSession) {
+      setPickedTeamByGameId({});
+    }
+  }
 
   useEffect(() => {
     fetch(`/api/games?season=${SEASON}&team=${abbreviation}`)
       .then((res) => res.json())
       .then(setGames);
   }, [abbreviation]);
+
+  useEffect(() => {
+    if (!session) return;
+    fetch("/api/predictions")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((predictions: Prediction[]) => {
+        const map: Record<string, string> = {};
+        for (const prediction of predictions) {
+          map[prediction.gameId] = prediction.pickedTeamId;
+        }
+        setPickedTeamByGameId(map);
+      });
+  }, [session]);
 
   const firstGame = games?.[0];
   const teamName = firstGame
@@ -51,7 +76,7 @@ export default function TeamSchedulePage({
           <ul className="mx-auto flex w-full max-w-2xl flex-col gap-3">
             {games.map((game) => (
               <li key={game.id}>
-                <GameBox game={game} />
+                <GameBox game={game} pickedTeamId={pickedTeamByGameId[game.id]} />
               </li>
             ))}
           </ul>

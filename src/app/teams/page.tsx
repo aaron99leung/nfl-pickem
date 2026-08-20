@@ -25,7 +25,13 @@ export default function TeamsPage() {
       </Reveal>
 
       {!teams ? (
-        <p>Loading...</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className={`grid ${GRID_COLS} justify-center gap-4`}>
+            {Array.from({ length: 8 }, (_, i) => (
+              <div key={i} className="skeleton h-24 w-28 sm:h-32 sm:w-[9.5rem] lg:h-40 lg:w-48"></div>
+            ))}
+          </div>
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <div className="flex flex-col items-center gap-4">

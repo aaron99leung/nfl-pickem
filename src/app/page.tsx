@@ -13,7 +13,7 @@ import { AuthModal } from "@/components/AuthModal";
 import { authClient } from "@/lib/auth-client";
 import { betrayed } from "@/lib/fonts";
 
-const HERO_MOMENTS = ["Pick 6.", "Money Down.", "Lateral.", "Deep Ball.", "Stiff Arm.", "Touchdown."];
+const HERO_MOMENTS = ["Pick 6.", "Money Down.", "Lateral.", "One Hand.", "Stiff Arm.", "Touchdown."];
 
 export default function Home() {
   const bentoSectionRef = useRef<HTMLElement>(null);

@@ -19,8 +19,6 @@ export async function GET(
     select: {
       id: true,
       name: true,
-      favouriteTeam: true,
-      favouritePlayer: true,
     },
   });
 

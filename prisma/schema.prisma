@@ -96,9 +96,6 @@ model User {
   accounts      Account[]
   predictions   Prediction[]
 
-  favouriteTeam   String?
-  favouritePlayer String?
-
   @@unique([email])
   @@map("user")
 }

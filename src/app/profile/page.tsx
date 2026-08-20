@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import type { Stats } from "@/lib/types";
+import { Reveal } from "@/components/Reveal";
+import { formatAccuracy } from "@/lib/stats";
 
 export default function ProfilePage() {
   const { data: session, isPending } = authClient.useSession();
@@ -15,86 +17,40 @@ export default function ProfilePage() {
       .then(setStats);
   }, [session]);
 
-  if (isPending) return <p className="p-4">Loading...</p>;
+  if (isPending) {
+    return (
+      <div className="p-4">
+        <span className="loading loading-infinity loading-xl"></span>
+      </div>
+    );
+  }
   if (!session) return <p className="p-4">You must be signed in to view this page.</p>;
 
   return (
-    <div className="flex flex-col gap-6 p-4">
-      <h1 className="text-2xl">{session.user.name}</h1>
+    <div className="flex flex-col gap-16 p-4">
+      <Reveal mode="mount">
+        <h1 className="text-center text-5xl font-semibold py-16">{session.user.name}</h1>
+        <p className="text-center text-lg text-white/70">Your picks and streaks in one place, full analysis of your prediction performance</p>
+      </Reveal>
 
       {!stats ? (
         <span className="loading loading-infinity loading-xl"></span>
       ) : (
-        <div className="flex flex-col gap-1">
-          <p>Current streak: {stats.currentStreak}</p>
-          <p>Longest streak: {stats.longestStreak}</p>
-          <p>Accuracy: {stats.accuracy}</p>
+        <div className="mx-auto grid w-full max-w-3xl grid-cols-3 gap-3">
+          <div className="rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3">
+            <p className="text-xs font-medium text-white/50">Current Streak</p>
+            <p className="text-2xl font-bold text-white">{stats.currentStreak}</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3">
+            <p className="text-xs font-medium text-white/50">Longest Streak</p>
+            <p className="text-2xl font-bold text-white">{stats.longestStreak}</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3">
+            <p className="text-xs font-medium text-white/50">Accuracy</p>
+            <p className="text-2xl font-bold text-white">{formatAccuracy(stats.accuracy)}</p>
+          </div>
         </div>
       )}
-
-      {/* Keyed by user id so the form's local state re-initialises from the
-          session if the signed-in user ever changes. */}
-      <FavouritesForm
-        key={session.user.id}
-        initialFavouriteTeam={session.user.favouriteTeam ?? ""}
-        initialFavouritePlayer={session.user.favouritePlayer ?? ""}
-      />
     </div>
-  );
-}
-
-function FavouritesForm({
-  initialFavouriteTeam,
-  initialFavouritePlayer,
-}: {
-  initialFavouriteTeam: string;
-  initialFavouritePlayer: string;
-}) {
-  const [favouriteTeam, setFavouriteTeam] = useState(initialFavouriteTeam);
-  const [favouritePlayer, setFavouritePlayer] = useState(initialFavouritePlayer);
-  const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
-    setSaved(false);
-    setSaving(true);
-    await authClient.updateUser({ favouriteTeam, favouritePlayer });
-    setSaving(false);
-    setSaved(true);
-  }
-
-  return (
-    <form onSubmit={handleSave} className="flex flex-col gap-3 max-w-sm">
-      <label className="flex flex-col gap-1">
-        Favourite team
-        <input
-          type="text"
-          value={favouriteTeam}
-          onChange={(e) => setFavouriteTeam(e.target.value)}
-          className="border p-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1">
-        Favourite player
-        <input
-          type="text"
-          value={favouritePlayer}
-          onChange={(e) => setFavouritePlayer(e.target.value)}
-          className="border p-2"
-        />
-      </label>
-
-      <button type="submit" disabled={saving} className="border p-2 w-fit">
-        {saving ? (
-          <span className="loading loading-infinity loading-xl"></span>
-        ) : (
-          "Save"
-        )}
-      </button>
-
-      {saved && <p>Saved.</p>}
-    </form>
   );
 }

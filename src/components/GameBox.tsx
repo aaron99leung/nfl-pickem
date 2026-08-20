@@ -13,9 +13,18 @@ function formatKickoff(iso: string) {
   return `${datePart} — ${timePart}`;
 }
 
-export function GameBox({ game }: { game: Game }) {
+export function GameBox({ game, pickedTeamId }: { game: Game; pickedTeamId?: string }) {
   const isCancelled = game.status === "CANCELLED";
   const hasScore = game.status === "FINAL" && game.homeScore !== null && game.awayScore !== null;
+
+  const winningTeamId = hasScore
+    ? game.homeScore! > game.awayScore!
+      ? game.homeTeam.id
+      : game.awayScore! > game.homeScore!
+        ? game.awayTeam.id
+        : null
+    : null;
+  const isCorrect = pickedTeamId && winningTeamId ? pickedTeamId === winningTeamId : null;
 
   const home = TEAM_COLORS[game.homeTeam.abbreviation];
   const away = TEAM_COLORS[game.awayTeam.abbreviation];
@@ -31,7 +40,36 @@ export function GameBox({ game }: { game: Game }) {
         <span>Home</span>
         <span>Away</span>
       </div>
-      <div className="relative flex h-[172px] w-full overflow-hidden rounded-xl">
+      <div className="relative">
+      {isCorrect !== null && (
+        <div
+          className={cn(
+            "absolute -top-2.5 right-4 z-[5] flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-md",
+            isCorrect ? "bg-emerald-400 text-emerald-950" : "bg-red-400 text-red-950"
+          )}
+        >
+          {isCorrect ? (
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          ) : (
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          )}
+          {isCorrect ? "Correct" : "Missed"}
+        </div>
+      )}
+      <div
+        className="relative flex h-[172px] w-full overflow-hidden rounded-xl"
+        style={
+          isCorrect === true
+            ? { boxShadow: "0 0 0 3px #34d399, 0 6px 20px rgba(52,211,153,0.35)" }
+            : isCorrect === false
+              ? { boxShadow: "0 0 0 3px #f87171, 0 6px 20px rgba(248,113,113,0.35)" }
+              : undefined
+        }
+      >
       <div className="relative flex w-1/2 flex-col items-center justify-center gap-1" style={{ backgroundColor: homeBg }}>
         <div className="text-3xl font-bold" style={{ color: homeText, textShadow: "0 1px 3px rgba(0,0,0,0.35)" }}>
           {game.homeTeam.abbreviation}
@@ -92,6 +130,7 @@ export function GameBox({ game }: { game: Game }) {
         )}
       >
         {game.status} &middot; {formatKickoff(game.kickoffAt)}
+      </div>
       </div>
       </div>
     </div>

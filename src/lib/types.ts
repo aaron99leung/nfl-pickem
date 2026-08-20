@@ -1,4 +1,5 @@
 export interface Team {
+  id: string;
   abbreviation: string;
   name: string;
   conference: string;
@@ -16,6 +17,17 @@ export interface Game {
   awayTeam: Team;
 }
 
+export interface Prediction {
+  id: string;
+  userId: string;
+  gameId: string;
+  pickedTeamId: string;
+  createdAt: string;
+  updatedAt: string;
+  game: Game;
+  pickedTeam: Team;
+}
+
 export interface Stats {
   currentStreak: number;
   longestStreak: number;
@@ -30,6 +42,4 @@ export interface LeaderboardEntry extends Stats {
 export interface PublicUser extends Stats {
   id: string;
   name: string;
-  favouriteTeam: string | null;
-  favouritePlayer: string | null;
 }

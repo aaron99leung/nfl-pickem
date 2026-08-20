@@ -20,7 +20,11 @@ export async function GET(req: NextRequest) {
   }
   const sortBy = sortByParam as SortField;
 
-  const users = await prisma.user.findMany();
+  // Deliberately using `select` rather than fetching the whole User row —
+  // this is a public endpoint, so we don't want to expose sensitive fields
+  const users = await prisma.user.findMany({
+    select: { id: true, name: true },
+  });
 
   // Reusing the exact same computeStats function, calling once per user
   const leaderboard = await Promise.all(

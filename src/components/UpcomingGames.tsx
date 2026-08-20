@@ -19,7 +19,17 @@ export function UpcomingGames() {
       });
   }, []);
 
-  if (!games) return <p>Loading...</p>;
+  if (!games) {
+    return (
+      <div className="w-full overflow-hidden border-y border-white/20 bg-zinc-900 py-3">
+        <div className="flex w-full gap-10 px-4">
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} className="skeleton h-4 w-40 shrink-0"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (games.length === 0) return <p>No upcoming games.</p>;
 
   const track = [...games, ...games];
