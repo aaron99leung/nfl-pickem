@@ -12,10 +12,6 @@ export async function GET(req: NextRequest) {
 
   const games = await getGameResultsForUser(session.user.id);
 
-  // The streak only runs over graded (correct/incorrect) games, so find it
-  // over just that subsequence, then translate back to indices in the full
-  // `games` array — scheduled/cancelled games sit between them but aren't
-  // part of the streak itself.
   const gradedIndices: number[] = [];
   const gradedPicks = games.reduce<{ correct: boolean }[]>((acc, game, i) => {
     if (game.status === "correct" || game.status === "incorrect") {

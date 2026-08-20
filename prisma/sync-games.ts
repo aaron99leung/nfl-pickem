@@ -1,9 +1,3 @@
-// Location in your project: prisma/sync-games.ts
-//
-// Run manually for now (npx tsx prisma/sync-games.ts) — this is what
-// eventually becomes the daily cron job's logic, but we're testing it
-// by hand first, same pattern as the team seed script.
-
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
@@ -12,7 +6,6 @@ import { fetchWeekGames } from "../src/lib/espn";
 const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-// Hardcoded for now — becomes parameters once this moves into the cron job.
 const SEASON = 2026;
 const REGULAR_SEASON_WEEKS = 18;
 
@@ -23,7 +16,6 @@ async function main() {
     const games = await fetchWeekGames(SEASON, week);
 
     for (const game of games) {
-      // Games reference Teams by id, not abbreviation — look up the real ids.
       const homeTeam = await prisma.team.findUniqueOrThrow({
         where: { abbreviation: game.homeAbbreviation },
       });

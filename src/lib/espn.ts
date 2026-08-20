@@ -1,11 +1,3 @@
-// Location in your project: src/lib/espn.ts
-//
-// Isolated on purpose, per the earlier discussion about this being an
-// unofficial/undocumented API: every other file in the app should call
-// fetchWeekGames() and never touch ESPN's URL or response shape directly.
-// If ESPN ever changes their response format, this is the one file that
-// needs to change.
-
 export type EspnGame = {
   externalId: string;
   season: number;
@@ -47,8 +39,6 @@ export async function fetchWeekGames(season: number, week: number): Promise<Espn
       kickoffAt: new Date(event.date),
       homeAbbreviation: home.team.abbreviation,
       awayAbbreviation: away.team.abbreviation,
-      // ESPN sends "0" as a string for games that haven't been played yet —
-      // only trust the score once the game is actually FINAL.
       homeScore: completed ? Number(home.score) : null,
       awayScore: completed ? Number(away.score) : null,
       status: mapStatus(competition.status.type.name, completed),

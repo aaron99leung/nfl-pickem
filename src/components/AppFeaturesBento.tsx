@@ -6,7 +6,6 @@ import { GoogleIcon } from "@/components/GoogleIcon";
 import { FlickerSpinner } from "flicker-dot";
 import type { FlickerGrids } from "flicker-dot";
 
-// Made with Flicker · flicker.laurie.fyi
 const ACCURACY_TREND_GRIDS: FlickerGrids = [
   [
     false, false, false, true, false, false, false, false,

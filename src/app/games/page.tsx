@@ -15,7 +15,7 @@ const TAB_ITEMS: WeekTabBarItem[] = [
 ];
 
 export default function GamesPage() {
-  const [week, setWeek] = useState<number | null>(null); // null = full season
+  const [week, setWeek] = useState<number | null>(null);
   const [games, setGames] = useState<Game[] | null>(null);
   const [pickedTeamByGameId, setPickedTeamByGameId] = useState<Record<string, string>>({});
   const { data: session } = authClient.useSession();

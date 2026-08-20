@@ -42,8 +42,6 @@ const LEGEND = [
   { swatch: "bg-[#8b5cf6]", label: "Cancelled" },
 ] as const;
 
-// Grouped from the same `games` array GET /api/stats/history already returns —
-// no API/stats/grading changes needed, this is purely a client-side rollup.
 function computeWeeklyAccuracy(games: PickHistoryGame[]) {
   const byWeek = new Map<number, { correct: number; total: number }>();
 

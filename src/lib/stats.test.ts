@@ -17,7 +17,7 @@ describe("computeStats", () => {
       { correct: false },
       { correct: true },
     ];
-    expect(computeStats(results).accuracy).toBe(0.75); // 3 out of 4
+    expect(computeStats(results).accuracy).toBe(0.75);
   });
 
   it("treats an all-correct history as one continuous streak", () => {
@@ -32,15 +32,14 @@ describe("computeStats", () => {
     expect(computeStats(results).currentStreak).toBe(0);
   });
 
-  // A strong run in the middle of the history, then a miss, then only one correct pick since.
   it("distinguishes current streak from longest streak", () => {
     const results = [
       { correct: true },
       { correct: true },
       { correct: true },
-      { correct: true }, // longest streak: 4 correct in a row here
-      { correct: false }, // breaks it
-      { correct: true }, // only this one counts toward "current"
+      { correct: true },
+      { correct: false },
+      { correct: true },
     ];
     const stats = computeStats(results);
     expect(stats.currentStreak).toBe(1);

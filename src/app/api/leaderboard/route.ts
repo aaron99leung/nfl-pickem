@@ -6,8 +6,6 @@ import { getGradedPicksForUser } from "@/lib/grading";
 const VALID_SORT_FIELDS = ["currentStreak", "longestStreak", "accuracy"] as const;
 type SortField = (typeof VALID_SORT_FIELDS)[number];
 
-// GET /api/leaderboard?sortBy=currentStreak (default) | longestStreak | accuracy
-// Deliberately no auth check here — this is intentionally public data
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const sortByParam = searchParams.get("sortBy") ?? "currentStreak";
@@ -20,13 +18,10 @@ export async function GET(req: NextRequest) {
   }
   const sortBy = sortByParam as SortField;
 
-  // Deliberately using `select` rather than fetching the whole User row —
-  // this is a public endpoint, so we don't want to expose sensitive fields
   const users = await prisma.user.findMany({
     select: { id: true, name: true },
   });
 
-  // Reusing the exact same computeStats function, calling once per user
   const leaderboard = await Promise.all(
     users.map(async (user) => {
       const gradedPicks = await getGradedPicksForUser(user.id);

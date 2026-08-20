@@ -44,7 +44,6 @@ export default function LeaderboardPage() {
       .then(setEntries);
   }, [sortBy]);
 
-  // The podium always ranks by current streak, independent of the table's own sort.
   useEffect(() => {
     fetch("/api/leaderboard?sortBy=currentStreak")
       .then((res) => res.json())

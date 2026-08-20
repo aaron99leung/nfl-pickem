@@ -1,4 +1,3 @@
-// Plain inline SVGs — lucide-react doesn't ship brand icons (GitHub/LinkedIn).
 
 function GithubIcon() {
   return (
