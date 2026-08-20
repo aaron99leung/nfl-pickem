@@ -5,8 +5,7 @@ import type { Game, Prediction } from "@/lib/types";
 import { GameBox } from "@/components/GameBox";
 import { Reveal } from "@/components/Reveal";
 import { authClient } from "@/lib/auth-client";
-
-const SEASON = 2026;
+import { CURRENT_SEASON, formatSeasonLabel } from "@/lib/season";
 
 export default function TeamSchedulePage({
   params,
@@ -28,7 +27,7 @@ export default function TeamSchedulePage({
   }
 
   useEffect(() => {
-    fetch(`/api/games?season=${SEASON}&team=${abbreviation}`)
+    fetch(`/api/games?season=${CURRENT_SEASON}&team=${abbreviation}`)
       .then((res) => res.json())
       .then(setGames);
   }, [abbreviation]);
@@ -46,18 +45,37 @@ export default function TeamSchedulePage({
       });
   }, [session]);
 
+  async function handlePick(gameId: string, pickedTeamId: string) {
+    const res = await fetch("/api/predictions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ gameId, pickedTeamId }),
+    });
+    if (!res.ok) throw new Error("Failed to save pick");
+    setPickedTeamByGameId((prev) => ({ ...prev, [gameId]: pickedTeamId }));
+  }
+
   const firstGame = games?.[0];
   const teamName = firstGame
     ? firstGame.homeTeam.abbreviation === abbreviation
       ? firstGame.homeTeam.name
       : firstGame.awayTeam.name
     : abbreviation;
+  const season = firstGame?.season ?? CURRENT_SEASON;
 
   return (
     <div className="flex flex-col gap-16 p-4">
       <Reveal mode="mount">
         <h1 className="text-center text-5xl font-semibold py-16">{abbreviation} Schedule</h1>
         <p className="text-center text-lg text-white/70">Every game on the {teamName} schedule this season</p>
+        <p className="pt-2 text-center text-xs font-semibold uppercase tracking-wide text-white/40">
+          Season {formatSeasonLabel(season)}
+        </p>
+        {session && (
+          <p className="pt-2 text-center text-sm text-white/40">
+            Tap the yellow PICK circle on a game to choose your team before kickoff. Picks can be changed up until the game starts.
+          </p>
+        )}
       </Reveal>
 
       {!games ? (
@@ -76,7 +94,11 @@ export default function TeamSchedulePage({
           <ul className="mx-auto flex w-full max-w-2xl flex-col gap-3">
             {games.map((game) => (
               <li key={game.id}>
-                <GameBox game={game} pickedTeamId={pickedTeamByGameId[game.id]} />
+                <GameBox
+                  game={game}
+                  pickedTeamId={pickedTeamByGameId[game.id]}
+                  onPick={session ? handlePick : undefined}
+                />
               </li>
             ))}
           </ul>

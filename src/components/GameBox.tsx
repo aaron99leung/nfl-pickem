@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Game } from "@/lib/types";
 import { TEAM_COLORS } from "@/lib/teamColors";
 import { cn } from "@/lib/utils";
@@ -13,9 +16,24 @@ function formatKickoff(iso: string) {
   return `${datePart} — ${timePart}`;
 }
 
-export function GameBox({ game, pickedTeamId }: { game: Game; pickedTeamId?: string }) {
+export function GameBox({
+  game,
+  pickedTeamId,
+  onPick,
+}: {
+  game: Game;
+  pickedTeamId?: string;
+  onPick?: (gameId: string, teamId: string) => Promise<void>;
+}) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [submittingTeamId, setSubmittingTeamId] = useState<string | null>(null);
+  const [error, setError] = useState(false);
+
   const isCancelled = game.status === "CANCELLED";
   const hasScore = game.status === "FINAL" && game.homeScore !== null && game.awayScore !== null;
+  const kickoffPassed = new Date() >= new Date(game.kickoffAt);
+  const canPick = !!onPick && !isCancelled && !hasScore && !kickoffPassed;
+  const isPending = !!pickedTeamId && !hasScore && !isCancelled;
 
   const winningTeamId = hasScore
     ? game.homeScore! > game.awayScore!
@@ -33,6 +51,27 @@ export function GameBox({ game, pickedTeamId }: { game: Game; pickedTeamId?: str
   const awayBg = isCancelled ? CANCELLED_AWAY_BG : (away?.primary ?? "#1a1a1a");
   const homeText = isCancelled ? CANCELLED_TEXT : (home?.secondary ?? "#ffffff");
   const awayText = isCancelled ? CANCELLED_TEXT : (away?.secondary ?? "#ffffff");
+
+  const pickedAbbreviation =
+    pickedTeamId === game.homeTeam.id
+      ? game.homeTeam.abbreviation
+      : pickedTeamId === game.awayTeam.id
+        ? game.awayTeam.abbreviation
+        : null;
+
+  async function handlePick(teamId: string) {
+    if (!onPick) return;
+    setSubmittingTeamId(teamId);
+    setError(false);
+    try {
+      await onPick(game.id, teamId);
+      setDrawerOpen(false);
+    } catch {
+      setError(true);
+    } finally {
+      setSubmittingTeamId(null);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -60,6 +99,14 @@ export function GameBox({ game, pickedTeamId }: { game: Game; pickedTeamId?: str
           {isCorrect ? "Correct" : "Missed"}
         </div>
       )}
+      {isCorrect === null && isPending && (
+        <div className="absolute -top-2.5 right-4 z-[5] flex items-center gap-1 rounded-full bg-yellow-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-yellow-950 shadow-md">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          Picked: {pickedAbbreviation}
+        </div>
+      )}
       <div
         className="relative flex h-[172px] w-full overflow-hidden rounded-xl"
         style={
@@ -67,7 +114,9 @@ export function GameBox({ game, pickedTeamId }: { game: Game; pickedTeamId?: str
             ? { boxShadow: "0 0 0 3px #34d399, 0 6px 20px rgba(52,211,153,0.35)" }
             : isCorrect === false
               ? { boxShadow: "0 0 0 3px #f87171, 0 6px 20px rgba(248,113,113,0.35)" }
-              : undefined
+              : isCorrect === null && isPending
+                ? { boxShadow: "0 0 0 3px #facc15, 0 6px 20px rgba(250,204,21,0.35)" }
+                : undefined
         }
       >
       <div className="relative flex w-1/2 flex-col items-center justify-center gap-1" style={{ backgroundColor: homeBg }}>
@@ -118,9 +167,16 @@ export function GameBox({ game, pickedTeamId }: { game: Game; pickedTeamId?: str
           </div>
         </div>
       ) : (
-        <div className="absolute left-1/2 top-1/2 z-[3] flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black text-xs font-bold text-white shadow-lg">
-          VS
-        </div>
+        <button
+          type="button"
+          onClick={canPick && !pickedTeamId ? () => setDrawerOpen((o) => !o) : undefined}
+          className={cn(
+            "absolute left-1/2 top-1/2 z-[3] flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black text-xs font-bold text-white shadow-lg",
+            canPick && !pickedTeamId ? "cursor-pointer animate-glow-pulse" : "cursor-default"
+          )}
+        >
+          {canPick && !pickedTeamId ? "PICK" : "VS"}
+        </button>
       )}
 
       <div
@@ -133,6 +189,59 @@ export function GameBox({ game, pickedTeamId }: { game: Game; pickedTeamId?: str
       </div>
       </div>
       </div>
+
+      {canPick && (
+        <div
+          className="overflow-hidden transition-[max-height,opacity] duration-300 ease-out"
+          style={{ maxHeight: drawerOpen ? 220 : 0, opacity: drawerOpen ? 1 : 0 }}
+        >
+          <div className="flex gap-2.5 pt-2">
+            {[game.homeTeam, game.awayTeam].map((team) => {
+              const colors = TEAM_COLORS[team.abbreviation];
+              const isSubmitting = submittingTeamId === team.id;
+              return (
+                <button
+                  key={team.id}
+                  type="button"
+                  disabled={!!submittingTeamId}
+                  onClick={() => handlePick(team.id)}
+                  className="flex h-[190px] w-1/2 flex-col items-center justify-center gap-2 rounded-xl transition-transform hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-60"
+                  style={{
+                    background: `linear-gradient(160deg, ${colors?.primary ?? "#1a1a1a"}, rgba(0,0,0,0.65))`,
+                  }}
+                >
+                  <div className="text-2xl font-bold" style={{ color: colors?.secondary ?? "#ffffff" }}>
+                    {team.abbreviation}
+                  </div>
+                  <div className="text-[11px] font-medium opacity-85" style={{ color: colors?.secondary ?? "#ffffff" }}>
+                    {team.name}
+                  </div>
+                  <div className="mt-1.5 rounded-full bg-black/35 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+                    {isSubmitting ? (
+                      <span className="loading loading-infinity loading-xs"></span>
+                    ) : (
+                      "Tap to pick"
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          {error && (
+            <p className="pt-2 text-center text-[11px] font-medium text-red-400">Couldn&apos;t save your pick — try again</p>
+          )}
+        </div>
+      )}
+
+      {canPick && pickedTeamId && (
+        <button
+          type="button"
+          onClick={() => setDrawerOpen((o) => !o)}
+          className="self-center text-xs font-medium text-white/80 underline"
+        >
+          Change pick
+        </button>
+      )}
     </div>
   );
 }

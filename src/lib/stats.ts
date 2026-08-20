@@ -51,3 +51,30 @@ export function computeStats(results: GradedPick[]): Stats {
 export function formatAccuracy(accuracy: number): string {
   return `${Math.round(accuracy * 100)}%`;
 }
+
+export function findLongestStreakRange(
+  results: GradedPick[]
+): { startIndex: number; endIndex: number } | null {
+  let bestStart = -1;
+  let bestEnd = -1;
+  let bestLength = 0;
+  let currentStart = -1;
+  let currentLength = 0;
+
+  results.forEach((result, i) => {
+    if (result.correct) {
+      if (currentLength === 0) currentStart = i;
+      currentLength += 1;
+      if (currentLength > bestLength) {
+        bestLength = currentLength;
+        bestStart = currentStart;
+        bestEnd = i;
+      }
+    } else {
+      currentLength = 0;
+    }
+  });
+
+  if (bestLength === 0) return null;
+  return { startIndex: bestStart, endIndex: bestEnd };
+}

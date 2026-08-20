@@ -8,6 +8,7 @@ export interface Team {
 
 export interface Game {
   id: string;
+  season: number;
   week: number;
   kickoffAt: string;
   status: "SCHEDULED" | "FINAL" | "CANCELLED";
@@ -36,10 +37,5 @@ export interface Stats {
 
 export interface LeaderboardEntry extends Stats {
   userId: string;
-  name: string;
-}
-
-export interface PublicUser extends Stats {
-  id: string;
   name: string;
 }

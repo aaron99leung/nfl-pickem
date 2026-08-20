@@ -112,8 +112,8 @@ export default function Home() {
         <div className="absolute inset-0 -z-20 bg-[url('/image/herobg/bnwdither.png')] bg-no-repeat bg-cover bg-[center_65%]" />
 
         <EmojiTrail className="relative z-10 flex flex-col">
-          <section className="flex min-h-[50vh] flex-col items-center justify-center gap-3 px-4">
-            <Reveal className="flex flex-col items-center gap-3 rounded-xl bg-black/60 p-8">
+          <section className="flex min-h-0 flex-col items-center justify-center gap-3 px-4 sm:min-h-[50vh]">
+            <Reveal className="flex flex-col items-center gap-3 rounded-xl bg-black/60 p-5 sm:p-8">
               <SplitFlapText
                 flipDuration={0.12}
                 stagger={0.06}
@@ -124,7 +124,7 @@ export default function Home() {
                 textColor="#f8fafc"
                 tileRadius={8}
                 gap={6}
-                fontSize={52}
+                fontSize="clamp(1.1rem, 5vw, 3.25rem)"
                 loop
                 padTo={12}
               />

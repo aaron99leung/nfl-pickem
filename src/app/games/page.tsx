@@ -6,8 +6,8 @@ import { WeekTabBar, type WeekTabBarItem } from "@/components/WeekTabBar";
 import { Reveal } from "@/components/Reveal";
 import { GameBox } from "@/components/GameBox";
 import { authClient } from "@/lib/auth-client";
+import { CURRENT_SEASON, formatSeasonLabel } from "@/lib/season";
 
-const SEASON = 2026;
 const WEEKS = Array.from({ length: 18 }, (_, i) => i + 1);
 const TAB_ITEMS: WeekTabBarItem[] = [
   { label: "Full Season", value: null },
@@ -31,8 +31,8 @@ export default function GamesPage() {
 
   useEffect(() => {
     const url = week
-      ? `/api/games?season=${SEASON}&week=${week}`
-      : `/api/games?season=${SEASON}`;
+      ? `/api/games?season=${CURRENT_SEASON}&week=${week}`
+      : `/api/games?season=${CURRENT_SEASON}`;
 
     fetch(url)
       .then((res) => res.json())
@@ -52,11 +52,31 @@ export default function GamesPage() {
       });
   }, [session]);
 
+  const season = games?.[0]?.season ?? CURRENT_SEASON;
+
+  async function handlePick(gameId: string, pickedTeamId: string) {
+    const res = await fetch("/api/predictions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ gameId, pickedTeamId }),
+    });
+    if (!res.ok) throw new Error("Failed to save pick");
+    setPickedTeamByGameId((prev) => ({ ...prev, [gameId]: pickedTeamId }));
+  }
+
   return (
     <div className="flex flex-col gap-16 p-4 pb-32">
       <Reveal mode="mount">
         <h1 className="text-center text-5xl font-semibold py-16">Game Schedules</h1>
         <p className="text-center text-lg text-white/70">Browse every game, by season and week</p>
+        <p className="pt-2 text-center text-xs font-semibold uppercase tracking-wide text-white/40">
+          Season {formatSeasonLabel(season)}
+        </p>
+        {session && (
+          <p className="pt-2 text-center text-sm text-white/40">
+            Tap the PICK circle on a game to choose your team before kickoff, picks can be changed up until the game starts
+          </p>
+        )}
       </Reveal>
 
       {!games ? (
@@ -75,7 +95,11 @@ export default function GamesPage() {
           <ul className="mx-auto flex w-full max-w-2xl flex-col gap-3">
             {games.map((game) => (
               <li key={game.id}>
-                <GameBox game={game} pickedTeamId={pickedTeamByGameId[game.id]} />
+                <GameBox
+                  game={game}
+                  pickedTeamId={pickedTeamByGameId[game.id]}
+                  onPick={session ? handlePick : undefined}
+                />
               </li>
             ))}
           </ul>

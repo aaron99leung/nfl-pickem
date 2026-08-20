@@ -1,18 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { ChevronDown, Flame } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFire } from "@fortawesome/free-solid-svg-icons";
 import type { LeaderboardEntry } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
 import { formatAccuracy } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { betrayed } from "@/lib/fonts";
+import { CURRENT_SEASON, formatSeasonLabel } from "@/lib/season";
 
 const SORT_OPTIONS = [
+  { value: "accuracy", label: "Accuracy" },
   { value: "currentStreak", label: "Current Streak" },
   { value: "longestStreak", label: "Longest Streak" },
-  { value: "accuracy", label: "Accuracy" },
 ] as const;
 
 type SortBy = (typeof SORT_OPTIONS)[number]["value"];
@@ -32,7 +34,7 @@ function getInitials(name: string) {
 }
 
 export default function LeaderboardPage() {
-  const [sortBy, setSortBy] = useState<SortBy>("currentStreak");
+  const [sortBy, setSortBy] = useState<SortBy>("accuracy");
   const [entries, setEntries] = useState<LeaderboardEntry[] | null>(null);
   const [podiumEntries, setPodiumEntries] = useState<LeaderboardEntry[] | null>(null);
 
@@ -64,9 +66,12 @@ export default function LeaderboardPage() {
           <span className={`${betrayed.className} text-yellow-100`}>Hail Mary</span> League
         </h1>
         <p className="text-center text-lg text-white/70">Rankings of the top performers in the league, by 3 categories</p>
+        <p className="pt-2 text-center text-xs font-semibold uppercase tracking-wide text-white/40">
+          Season {formatSeasonLabel(CURRENT_SEASON)}
+        </p>
       </Reveal>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-2">
+      <Reveal mode="mount" delay={0.1} className="mx-auto flex w-full max-w-3xl flex-col gap-2">
         <span className="text-sm font-semibold uppercase tracking-wide text-white/50">Rank by</span>
         <div className="flex gap-2">
           {SORT_OPTIONS.map((option) => (
@@ -84,12 +89,48 @@ export default function LeaderboardPage() {
             </button>
           ))}
         </div>
-      </div>
+        <p className="text-sm text-white/40">Accuracy % is based on correct to incorrect picks ratio - players&apos; win-rate</p>
+      </Reveal>
 
       {!entries ? (
-        <span className="loading loading-infinity loading-xl"></span>
-      ) : (
         <div className="mx-auto w-full max-w-3xl overflow-hidden bg-zinc-900/60">
+          <table className="w-full table-fixed border-collapse">
+            <colgroup>
+              <col className="w-[40%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th className="border border-white/10 p-2 text-left">Player</th>
+                <th className="border border-white/10 p-2 text-left">Accuracy %</th>
+                <th className="border border-white/10 p-2 text-left">Current Streak</th>
+                <th className="border border-white/10 p-2 text-left">Longest Streak</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 5 }, (_, i) => (
+                <tr key={i}>
+                  <td className="border border-white/10 p-2">
+                    <div className="skeleton h-4 w-3/4 rounded"></div>
+                  </td>
+                  <td className="border border-white/10 p-2">
+                    <div className="skeleton h-4 w-10 rounded"></div>
+                  </td>
+                  <td className="border border-white/10 p-2">
+                    <div className="skeleton h-4 w-6 rounded"></div>
+                  </td>
+                  <td className="border border-white/10 p-2">
+                    <div className="skeleton h-4 w-6 rounded"></div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <Reveal mode="mount" delay={0.2} className="mx-auto w-full max-w-3xl overflow-hidden bg-zinc-900/60">
           <table className="w-full table-fixed border-collapse">
             <colgroup>
               <col className="w-[40%]" />
@@ -117,28 +158,28 @@ export default function LeaderboardPage() {
             <tbody>
               {entries.map((entry) => (
                 <tr key={entry.userId}>
-                  <td className="border border-white/10 p-2">
-                    <Link href={`/users/${entry.userId}`} className="underline">
-                      {entry.name}
-                    </Link>
-                  </td>
+                  <td className="border border-white/10 p-2">{entry.name}</td>
+                  <td className="border border-white/10 p-2">{formatAccuracy(entry.accuracy)}</td>
                   <td className="border border-white/10 p-2">{entry.currentStreak}</td>
                   <td className="border border-white/10 p-2">{entry.longestStreak}</td>
-                  <td className="border border-white/10 p-2">{formatAccuracy(entry.accuracy)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </Reveal>
       )}
 
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 lg:max-w-6xl">
-        <h2 className="text-center text-2xl font-semibold lg:text-3xl">Current Leaders</h2>
+        <h2 className="text-center text-2xl font-semibold lg:text-3xl">Current Streak Leaders</h2>
 
         {!podiumEntries ? (
-          <span className="loading loading-infinity loading-xl self-center"></span>
-        ) : (
           <div className="flex items-end justify-center gap-4 lg:gap-12">
+            <div className="skeleton h-[180px] w-[110px] rounded-xl lg:h-[260px] lg:w-72"></div>
+            <div className="skeleton h-[220px] w-[110px] rounded-xl lg:h-[320px] lg:w-72"></div>
+            <div className="skeleton h-[170px] w-[110px] rounded-xl lg:h-[240px] lg:w-72"></div>
+          </div>
+        ) : (
+          <Reveal mode="mount" delay={0.3} className="flex items-end justify-center gap-4 lg:gap-12">
             {podium.map(({ rank, entry }) => (
               <div
                 key={entry.userId}
@@ -169,18 +210,16 @@ export default function LeaderboardPage() {
                   {getInitials(entry.name)}
                 </span>
 
-                <Link href={`/users/${entry.userId}`} className="text-sm font-medium text-white underline lg:text-2xl">
-                  {entry.name}
-                </Link>
+                <span className="text-sm font-medium text-white lg:text-2xl">{entry.name}</span>
 
                 <span className="flex items-center gap-1 text-2xl font-bold text-yellow-400 lg:gap-3 lg:text-6xl">
-                  <Flame className="size-5 lg:size-12" />
+                  <FontAwesomeIcon icon={faFire} className="size-5 text-orange-500 lg:size-12" />
                   {entry.currentStreak}
                 </span>
                 <span className="text-[10px] font-semibold uppercase tracking-wide text-white/40 lg:text-sm">Current Streak</span>
               </div>
             ))}
-          </div>
+          </Reveal>
         )}
       </div>
     </div>

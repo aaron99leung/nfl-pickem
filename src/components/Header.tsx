@@ -38,7 +38,7 @@ export function Header() {
         <Link
           href="/"
           aria-label="Home"
-          className={`translate-y-[9px] rounded p-2 text-xl ${betrayed.className}`}
+          className={`translate-y-[9px] rounded p-2 text-xl text-yellow-100 ${betrayed.className}`}
         >
           Hail Mary
         </Link>
