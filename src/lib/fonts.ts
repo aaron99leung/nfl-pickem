@@ -40,3 +40,34 @@ export const clashGrotesk = localFont({
   ],
   variable: "--font-clash-grotesk",
 });
+
+export const satoshi = localFont({
+  src: [
+    {
+      path: "./fonts/Satoshi_Complete/Fonts/OTF/Satoshi-Light.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Satoshi_Complete/Fonts/OTF/Satoshi-Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Satoshi_Complete/Fonts/OTF/Satoshi-Medium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Satoshi_Complete/Fonts/OTF/Satoshi-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Satoshi_Complete/Fonts/OTF/Satoshi-Black.otf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-satoshi",
+});

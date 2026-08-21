@@ -13,7 +13,7 @@ import { AuthModal } from "@/components/AuthModal";
 import { authClient } from "@/lib/auth-client";
 import { betrayed } from "@/lib/fonts";
 
-const HERO_MOMENTS = ["Pick 6.", "Money Down.", "Lateral.", "One Hand.", "Stiff Arm.", "Touchdown."];
+const HERO_MOMENTS = ["Pick 6.", "Money Down.", "Lateral.", "One Hander.", "Stiff Arm.", "Touchdown."];
 
 export default function Home() {
   const bentoSectionRef = useRef<HTMLElement>(null);
@@ -36,7 +36,7 @@ export default function Home() {
         </Reveal>
         <Reveal mode="mount" delay={0.15}>
           <p className="relative z-10 mt-6 flex items-center gap-2 text-3xl text-white">
-            Moments like
+            Moments like a
             <RotatingText
               texts={HERO_MOMENTS}
               mainClassName="justify-center overflow-hidden rounded-lg bg-zinc-900 px-2 py-0.5 text-yellow-100 sm:px-2 sm:py-1 md:px-3 md:py-2"
@@ -109,7 +109,7 @@ export default function Home() {
       <div className="pointer-events-none h-screen" />
 
       <div className="relative z-10">
-        <div className="absolute inset-0 -z-20 bg-[url('/image/herobg/bnwdither.png')] bg-no-repeat bg-cover bg-[center_65%]" />
+        <div className="absolute inset-0 -z-20 bg-[url('/image/herobg/herobg3.png')] bg-no-repeat bg-cover bg-[center_65%]" />
 
         <EmojiTrail className="relative z-10 flex flex-col">
           <section className="flex min-h-0 flex-col items-center justify-center gap-3 px-4 sm:min-h-[50vh]">
