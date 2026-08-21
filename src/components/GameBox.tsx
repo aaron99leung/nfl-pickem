@@ -12,7 +12,7 @@ const CANCELLED_TEXT = "rgba(255,255,255,0.5)";
 function formatKickoff(iso: string) {
   const date = new Date(iso);
   const datePart = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-  const timePart = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const timePart = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" });
   return `${datePart} — ${timePart}`;
 }
 
