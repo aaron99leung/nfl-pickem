@@ -34,6 +34,7 @@ export function GameBox({
   const kickoffPassed = new Date() >= new Date(game.kickoffAt);
   const canPick = !!onPick && !isCancelled && !hasScore && !kickoffPassed;
   const isPending = !!pickedTeamId && !hasScore && !isCancelled;
+  const isLocked = kickoffPassed && !hasScore && !isCancelled;
 
   const winningTeamId = hasScore
     ? game.homeScore! > game.awayScore!
@@ -175,7 +176,16 @@ export function GameBox({
             canPick && !pickedTeamId ? "cursor-pointer animate-glow-pulse" : "cursor-default"
           )}
         >
-          {canPick && !pickedTeamId ? "PICK" : "VS"}
+          {canPick && !pickedTeamId ? (
+            "PICK"
+          ) : isLocked ? (
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+          ) : (
+            "VS"
+          )}
         </button>
       )}
 

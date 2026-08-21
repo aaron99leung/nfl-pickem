@@ -8,25 +8,12 @@ datasource db {
   provider = "postgresql"
 }
 
-// --- App models -------------------------------------------------------
-// The User/Session/Account/Verification models Better Auth needs are NOT
-// written here by hand. Once Better Auth is installed and configured,
-// run `npx @better-auth/cli@latest generate` and it will append those
-// models to this same file for you. After that, add one line to the
-// generated User model:
-//
-//   predictions Prediction[]
-//
-// That's the only manual step — it wires the relation below to the
-// User model Better Auth creates, since its generator only knows about
-// its own tables, not yours.
-
 model Team {
   id           String @id @default(cuid())
-  abbreviation String @unique // e.g. "KC"
-  name         String // e.g. "Kansas City Chiefs"
-  conference   String // "AFC" | "NFC"
-  division     String // e.g. "West"
+  abbreviation String @unique
+  name         String
+  conference   String
+  division     String
 
   homeGames   Game[]       @relation("HomeTeam")
   awayGames   Game[]       @relation("AwayTeam")
@@ -43,7 +30,7 @@ enum GameStatus {
 
 model Game {
   id         String     @id @default(cuid())
-  externalId String     @unique // id from whichever NFL data API we sync from
+  externalId String     @unique
   season     Int
   week       Int
   kickoffAt  DateTime
@@ -54,7 +41,6 @@ model Game {
   homeTeam   Team   @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam   Team   @relation("AwayTeam", fields: [awayTeamId], references: [id])
 
-  // Null until the game is FINAL
   homeScore Int?
   awayScore Int?
 
@@ -72,14 +58,10 @@ model Prediction {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  // References the User model Better Auth will generate into this file —
-  // see the note at the top.
   user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
   game       Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
   pickedTeam Team @relation(fields: [pickedTeamId], references: [id])
 
-  // One pick per user per game — this is what makes "save a prediction"
-  // an upsert instead of duplicate rows.
   @@unique([userId, gameId])
   @@map("prediction")
 }
