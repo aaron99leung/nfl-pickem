@@ -22,7 +22,7 @@ export function Footer() {
           <span className="text-gray-300 font-medium">Aaron Leung</span>
           <div className="flex items-center gap-5">
             <a
-              href="https://github.com/aaron99leung/fantasy-travel-guide"
+              href="https://github.com/aaron99leung/nfl-pickem"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-white transition-colors"

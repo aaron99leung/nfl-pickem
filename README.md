@@ -1,10 +1,12 @@
 # Hail Mary - NFL Pick'em
 
-A full-stack NFL predictions app: pick a winner for every game, build a streak, climb a public leaderboard against other players, and analyse prediction performance over a season. Built as a portfolio project to practise shipping a complete product - real auth, a real external data source, scheduled background jobs, and a production deployment
+A full-stack NFL predictions app: pick a winner for every game, build a streak, climb a public leaderboard against other players, and analyse prediction performance over a season. Built as a portfolio project to practice shipping a complete product - real auth, a real external data source, scheduled background jobs, and a production deployment
 
 **Live app:** https://nfl-pickem-weld.vercel.app
 
-<!-- Add 2–4 screenshots or a short GIF here: home page, games page with a pick made, profile stats, leaderboard -->
+![Home page](docs/screenshots/home.png)
+
+<!-- Add: games page with a pick made, profile stats, leaderboard -->
 
 ## Features
 
@@ -69,7 +71,7 @@ A few decisions worth calling out:
 ## Local Set Up
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/aaron99leung/nfl-pickem.git
 cd nfl-pickem
 npm install
 ```
@@ -115,5 +117,5 @@ npm run dev
 - Season-scoped standings - Streaks, accuracy, and the leaderboard are currently one continuous all-time history with no season boundary; splitting them per season (like most real pick'em leagues) is a natural next step
 - Playoff bracket support - picks currently only cover the regular season; extending grading and pick submission to the postseason (Wild Card through the Super Bowl) would need bracket-aware logic, since who's even playing each round depends on earlier results
 - Head-to-head comparison view between two users and user public profile with in-depth statistics dashboards
-- User settings - allowing them to change passwords and username etc
+- User settings - allowing them to change passwords and username etc.
 - Team standings page - grouped by conference and division - win-loss records derived from `FINAL` games, plus playoff clinch indicators and legends; real NFL clinching scenarios involve tiebreakers, division vs. wild-card races, and strength-of-schedule comparisons for the website to be closer to a small rules engine
