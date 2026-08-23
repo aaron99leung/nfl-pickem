@@ -29,6 +29,8 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 - PostgreSQL (hosted on **Neon**) via **Prisma** ORM, using up-to-date Prisma's Neon driver adapter for serverless-friendly connections
 - **Better Auth** for authentication (email/password + Google OAuth), backed by its own Prisma-managed tables
 - Next.js Route Handlers as the API layer
+- **Vitest** for unit testing the core streak/accuracy logic
+- **API-first, tested before the UI existed** - every route was built and manually verified against real requests in Postman, including deliberately testing rejection paths (locked picks, invalid teams, duplicate signups), before any frontend page ever called it
 
 **Infrastructure**
 - Deployed on **Vercel**
@@ -111,6 +113,7 @@ npm run dev
 - **Working against an undocumented third-party API** - ESPN's scoreboard endpoint isn't an official public API, so there's no guaranteed stability; pushing me to isolate all of that risk behind one function (`fetchWeekGames`) rather than letting ESPN's response shape leak into the rest of the app
 - **Designing around eventual consistency** - Game results, and therefore grading, change on ESPN's schedule, not the user's. Computing grades on read instead of storing them turned out to be simpler to reason about than trying to keep a cached "correct/incorrect" field in sync via webhooks or triggers
 - **Serverless functions have real constraints.** A naive "resync the whole season" cron job would run 18 sequential external API calls - comfortably past a serverless function's timeout. Scoping the cron job to just the current and previous week was a direct optimised response to that constraint
+- **Breaking a circular dependency into sequential steps** - adopting Prisma 7 while wiring up Better Auth created a real chicken-and-egg problem: Better Auth's CLI needed a working Prisma client to generate the `User` model, but Prisma couldn't generate a working client until `User` existed, since `Prediction` already referenced it. Temporarily isolating that one relation broke the cycle - generate the client, let Better Auth fill in the missing model, then restore the relation
 
 ## Roadmap
 
