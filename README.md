@@ -5,6 +5,7 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 **Live app:** https://nfl-pickem-weld.vercel.app
 
 ![Home page](docs/screenshots/home.png)
+![Game and Team page](docs/screenshots/picks.gif)
 
 <!-- Add: games page with a pick made, profile stats, leaderboard -->
 
