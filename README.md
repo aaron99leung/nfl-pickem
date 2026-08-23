@@ -31,7 +31,6 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 - **Better Auth** for authentication (email/password + Google OAuth), backed by its own Prisma-managed tables
 - Next.js Route Handlers as the API layer
 - **Vitest** for unit testing the core streak/accuracy logic
-- **API-first, tested before the UI existed** - every route was built and manually verified against real requests in Postman, including deliberately testing rejection paths (locked picks, invalid teams, duplicate signups), before any frontend page ever called it
 
 **Infrastructure**
 - Deployed on **Vercel**
@@ -46,6 +45,7 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 - **Leaderboard** - accuracy is ranked by default; but can be ordered by current streak, or longest streak; no auth requirement, since standings are meant to be public
 - **Season-aware labels** - pages display the current season, derived from real game data rather than hardcoded per page
 - **Scheduled data sync** - a cron-triggered route auto re-syncs the current and previous week's games daily in case of late game entries
+- **API-first, tested before the UI existed** - every route was built and manually verified against real requests in Postman, including deliberately testing rejection paths (locked picks, invalid teams, duplicate signups), before any frontend page ever called it
 
 ## Architecture / how it works
 
@@ -122,4 +122,4 @@ npm run dev
 - Playoff bracket support - picks currently only cover the regular season; extending grading and pick submission to the postseason (Wild Card through the Super Bowl) would need bracket-aware logic, since who's even playing each round depends on earlier results
 - Head-to-head comparison view between two users and user public profile with in-depth statistics dashboards
 - User settings - allowing them to change passwords and username etc.
-- Team standings page - grouped by conference and division - win-loss records derived from `FINAL` games, plus playoff clinch indicators and legends; real NFL clinching scenarios involve tiebreakers, division vs. wild-card races, and strength-of-schedule comparisons for the website to be closer to a small rules engine
+- Team standings page - grouped by conference and division - win-loss records derived from `FINAL` games, plus playoff clinch indicators and legends; real NFL clinching scenarios involve tiebreakers, division vs wild-card races, and strength-of-schedule comparisons for the website to be closer to a small rules engine
