@@ -56,6 +56,47 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(prediction, { status: 200 });
 }
 
+export async function DELETE(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const gameId = searchParams.get("gameId");
+
+  if (!gameId) {
+    return NextResponse.json({ error: "gameId is required." }, { status: 400 });
+  }
+
+  const game = await prisma.game.findUnique({ where: { id: gameId } });
+  if (!game) {
+    return NextResponse.json({ error: "Game not found." }, { status: 404 });
+  }
+
+  if (new Date() >= game.kickoffAt) {
+    return NextResponse.json(
+      { error: "This game has already kicked off — picks are locked." },
+      { status: 403 }
+    );
+  }
+
+  try {
+    await prisma.prediction.delete({
+      where: {
+        userId_gameId: {
+          userId: session.user.id,
+          gameId,
+        },
+      },
+    });
+  } catch {
+    return NextResponse.json({ error: "No pick found for this game." }, { status: 404 });
+  }
+
+  return NextResponse.json({ success: true }, { status: 200 });
+}
+
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {

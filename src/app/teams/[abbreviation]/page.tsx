@@ -55,6 +55,16 @@ export default function TeamSchedulePage({
     setPickedTeamByGameId((prev) => ({ ...prev, [gameId]: pickedTeamId }));
   }
 
+  async function handleClearPick(gameId: string) {
+    const res = await fetch(`/api/predictions?gameId=${gameId}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to clear pick");
+    setPickedTeamByGameId((prev) => {
+      const next = { ...prev };
+      delete next[gameId];
+      return next;
+    });
+  }
+
   const firstGame = games?.[0];
   const teamName = firstGame
     ? firstGame.homeTeam.abbreviation === abbreviation
@@ -98,6 +108,7 @@ export default function TeamSchedulePage({
                   game={game}
                   pickedTeamId={pickedTeamByGameId[game.id]}
                   onPick={session ? handlePick : undefined}
+                  onClear={session ? handleClearPick : undefined}
                 />
               </li>
             ))}

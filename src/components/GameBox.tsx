@@ -20,14 +20,18 @@ export function GameBox({
   game,
   pickedTeamId,
   onPick,
+  onClear,
 }: {
   game: Game;
   pickedTeamId?: string;
   onPick?: (gameId: string, teamId: string) => Promise<void>;
+  onClear?: (gameId: string) => Promise<void>;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [submittingTeamId, setSubmittingTeamId] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
   const [error, setError] = useState(false);
+  const [clearError, setClearError] = useState(false);
 
   const isCancelled = game.status === "CANCELLED";
   const hasScore = game.status === "FINAL" && game.homeScore !== null && game.awayScore !== null;
@@ -71,6 +75,20 @@ export function GameBox({
       setError(true);
     } finally {
       setSubmittingTeamId(null);
+    }
+  }
+
+  async function handleClear() {
+    if (!onClear) return;
+    setClearing(true);
+    setClearError(false);
+    try {
+      await onClear(game.id);
+      setDrawerOpen(false);
+    } catch {
+      setClearError(true);
+    } finally {
+      setClearing(false);
     }
   }
 
@@ -244,13 +262,30 @@ export function GameBox({
       )}
 
       {canPick && pickedTeamId && (
-        <button
-          type="button"
-          onClick={() => setDrawerOpen((o) => !o)}
-          className="self-center text-xs font-medium text-white/80 underline"
-        >
-          Change pick
-        </button>
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen((o) => !o)}
+              className="text-xs font-medium text-white/80 underline"
+            >
+              Change pick
+            </button>
+            {onClear && (
+              <button
+                type="button"
+                onClick={handleClear}
+                disabled={clearing}
+                className="text-xs font-medium text-white/50 underline disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {clearing ? "Clearing…" : "Clear pick"}
+              </button>
+            )}
+          </div>
+          {clearError && (
+            <p className="text-[11px] font-medium text-red-400">Couldn&apos;t clear your pick — try again</p>
+          )}
+        </div>
       )}
     </div>
   );

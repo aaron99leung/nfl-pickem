@@ -64,6 +64,16 @@ export default function GamesPage() {
     setPickedTeamByGameId((prev) => ({ ...prev, [gameId]: pickedTeamId }));
   }
 
+  async function handleClearPick(gameId: string) {
+    const res = await fetch(`/api/predictions?gameId=${gameId}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to clear pick");
+    setPickedTeamByGameId((prev) => {
+      const next = { ...prev };
+      delete next[gameId];
+      return next;
+    });
+  }
+
   return (
     <div className="flex flex-col gap-16 p-4 pb-32">
       <Reveal mode="mount">
@@ -99,6 +109,7 @@ export default function GamesPage() {
                   game={game}
                   pickedTeamId={pickedTeamByGameId[game.id]}
                   onPick={session ? handlePick : undefined}
+                  onClear={session ? handleClearPick : undefined}
                 />
               </li>
             ))}
