@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeStats } from "./stats";
+import { computeStats, toGradedPicks } from "./stats";
 
 describe("computeStats", () => {
   it("returns all zeros for an empty history", () => {
@@ -44,5 +44,44 @@ describe("computeStats", () => {
     const stats = computeStats(results);
     expect(stats.currentStreak).toBe(1);
     expect(stats.longestStreak).toBe(4);
+  });
+});
+
+describe("toGradedPicks", () => {
+  it("counts a missed game against you, exactly like a wrong pick", () => {
+    const results = [
+      { status: "correct" as const },
+      { status: "missed" as const },
+    ];
+    expect(computeStats(toGradedPicks(results)).accuracy).toBe(0.5);
+  });
+
+  it("ignores games that cannot be graded yet", () => {
+    const results = [
+      { status: "correct" as const },
+      { status: "scheduled" as const },
+      { status: "unpicked" as const },
+      { status: "cancelled" as const },
+    ];
+    expect(toGradedPicks(results)).toEqual([{ correct: true }]);
+    expect(computeStats(toGradedPicks(results)).accuracy).toBe(1);
+  });
+
+  it("breaks the current streak on a missed game", () => {
+    const results = [
+      { status: "correct" as const },
+      { status: "correct" as const },
+      { status: "missed" as const },
+    ];
+    expect(computeStats(toGradedPicks(results)).currentStreak).toBe(0);
+  });
+
+  it("keeps a streak alive across a cancelled game", () => {
+    const results = [
+      { status: "correct" as const },
+      { status: "cancelled" as const },
+      { status: "correct" as const },
+    ];
+    expect(computeStats(toGradedPicks(results)).currentStreak).toBe(2);
   });
 });

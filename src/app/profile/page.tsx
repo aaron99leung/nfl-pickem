@@ -5,19 +5,17 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import type { Stats } from "@/lib/types";
 import { Reveal } from "@/components/Reveal";
-import { formatAccuracy } from "@/lib/stats";
+import { formatAccuracy, isGraded, type PickStatus } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrophy, faFire, faBullseye, faCircleXmark, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { faTrophy, faFire, faBullseye, faCircleXmark, faCircleCheck, faCircleMinus } from "@fortawesome/free-solid-svg-icons";
 import { CURRENT_SEASON, formatSeasonLabel } from "@/lib/season";
-
-type PickHistoryStatus = "correct" | "incorrect" | "scheduled" | "cancelled";
 
 type PickHistoryGame = {
   gameId: string;
   week: number;
   season: number;
-  status: PickHistoryStatus;
+  status: PickStatus;
   homeTeamAbbreviation: string;
   awayTeamAbbreviation: string;
 };
@@ -27,26 +25,39 @@ type PickHistoryResponse = {
   longestStreakRange: { startIndex: number; endIndex: number } | null;
 };
 
-const STATUS_LABEL: Record<PickHistoryStatus, string> = {
+const STATUS_LABEL: Record<PickStatus, string> = {
   correct: "Correct",
   incorrect: "Incorrect",
-  scheduled: "Scheduled",
-  cancelled: "Cancelled",
+  missed: "Missed - no pick made",
+  scheduled: "Picked - awaiting result",
+  unpicked: "Not picked yet",
+  cancelled: "Cancelled/tied - does not count",
+};
+
+const STATUS_SWATCH: Record<PickStatus, string> = {
+  correct: "bg-[#047857]",
+  incorrect: "bg-[#b91c1c]",
+  missed: "bg-[#b45309]",
+  scheduled: "bg-[#52525b]",
+  unpicked: "bg-[#27272a]",
+  cancelled: "bg-[#8b5cf6]",
 };
 
 const LEGEND = [
   { swatch: "bg-[#047857]", label: "Correct pick" },
   { swatch: "bg-[#b91c1c]", label: "Incorrect pick" },
+  { swatch: "bg-[#b45309]", label: "Missed" },
   { swatch: "bg-[#facc15]", label: "Longest streak" },
-  { swatch: "bg-[#3f3f46]", label: "Scheduled" },
-  { swatch: "bg-[#8b5cf6]", label: "Cancelled" },
+  { swatch: "bg-[#52525b]", label: "Awaiting result" },
+  { swatch: "bg-[#27272a]", label: "Not picked yet" },
+  { swatch: "bg-[#8b5cf6]", label: "Cancelled/tied" },
 ] as const;
 
 function computeWeeklyAccuracy(games: PickHistoryGame[]) {
   const byWeek = new Map<number, { correct: number; total: number }>();
 
   for (const game of games) {
-    if (game.status !== "correct" && game.status !== "incorrect") continue;
+    if (!isGraded(game.status)) continue;
     const entry = byWeek.get(game.week) ?? { correct: 0, total: 0 };
     entry.total += 1;
     if (game.status === "correct") entry.correct += 1;
@@ -60,7 +71,7 @@ function computeWeeklyAccuracy(games: PickHistoryGame[]) {
 
 function PickHistoryHeatmap({ games, longestStreakRange }: PickHistoryResponse) {
   if (games.length === 0) {
-    return <p className="py-8 text-center text-sm text-white/40">No picks yet this season.</p>;
+    return <p className="py-8 text-center text-sm text-white/40">No games scheduled yet this season.</p>;
   }
 
   return (
@@ -78,15 +89,7 @@ function PickHistoryHeatmap({ games, longestStreakRange }: PickHistoryResponse) 
               <div
                 className={cn(
                   "aspect-square rounded-sm",
-                  isStreak
-                    ? "bg-[#facc15]"
-                    : game.status === "correct"
-                      ? "bg-[#047857]"
-                      : game.status === "incorrect"
-                        ? "bg-[#b91c1c]"
-                        : game.status === "cancelled"
-                          ? "bg-[#8b5cf6]"
-                          : "bg-[#3f3f46]"
+                  isStreak ? "bg-[#facc15]" : STATUS_SWATCH[game.status]
                 )}
               />
               <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-white/10 bg-zinc-950 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
@@ -171,17 +174,27 @@ function WeeklyAccuracyChart({ games }: { games: PickHistoryGame[] }) {
   );
 }
 
-function CorrectIncorrectBar({ correct, incorrect }: { correct: number; incorrect: number }) {
-  const total = correct + incorrect;
+function CorrectIncorrectBar({
+  correct,
+  incorrect,
+  missed,
+}: {
+  correct: number;
+  incorrect: number;
+  missed: number;
+}) {
+  const total = correct + incorrect + missed;
   const correctPct = total > 0 ? (correct / total) * 100 : 0;
   const incorrectPct = total > 0 ? (incorrect / total) * 100 : 0;
+  const missedPct = total > 0 ? (missed / total) * 100 : 0;
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <p className="text-center text-xs font-medium text-white/50">Correct vs Incorrect</p>
+      <p className="text-center text-xs font-medium text-white/50">Correct vs Incorrect vs Missed</p>
       <div className="flex h-6 w-full overflow-hidden rounded-full border border-white/10 bg-zinc-800">
         <div className="h-full bg-[#047857]" style={{ width: `${correctPct}%` }} />
         <div className="h-full bg-[#b91c1c]" style={{ width: `${incorrectPct}%` }} />
+        <div className="h-full bg-[#b45309]" style={{ width: `${missedPct}%` }} />
       </div>
       <div className="flex items-center justify-between text-xs font-medium text-white/50">
         <span>
@@ -189,6 +202,9 @@ function CorrectIncorrectBar({ correct, incorrect }: { correct: number; incorrec
         </span>
         <span>
           Incorrect <span className="font-bold text-white">{incorrect}</span>
+        </span>
+        <span>
+          Missed <span className="font-bold text-white">{missed}</span>
         </span>
       </div>
     </div>
@@ -287,6 +303,7 @@ export default function ProfilePage() {
 
   const correctCount = pickHistory ? pickHistory.games.filter((g) => g.status === "correct").length : null;
   const incorrectCount = pickHistory ? pickHistory.games.filter((g) => g.status === "incorrect").length : null;
+  const missedCount = pickHistory ? pickHistory.games.filter((g) => g.status === "missed").length : null;
   const season = pickHistory?.games.at(-1)?.season ?? CURRENT_SEASON;
 
   return (
@@ -342,6 +359,9 @@ export default function ProfilePage() {
 
           <div className="flex w-full flex-col gap-4 rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-6">
             <p className="text-center text-xs font-medium text-white/50">Accuracy Breakdown</p>
+            <p className="text-center text-xs text-white/40">
+              Accuracy counts every game that has kicked off - a game you did not pick counts as a miss
+            </p>
             {!pickHistory ? (
               <div className="grid grid-cols-1 items-center gap-8 sm:grid-cols-3">
                 <div className="flex justify-center">
@@ -373,11 +393,20 @@ export default function ProfilePage() {
                     <span className="text-xs font-medium text-white/50">Incorrect Picks</span>
                     <span className="text-sm font-bold text-white">{incorrectCount}</span>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faCircleMinus} className="text-lg text-amber-600" />
+                    <span className="text-xs font-medium text-white/50">Missed Games</span>
+                    <span className="text-sm font-bold text-white">{missedCount}</span>
+                  </div>
                 </div>
 
                 <div className="flex w-full justify-center">
                   <div className="w-full max-w-[220px]">
-                    <CorrectIncorrectBar correct={correctCount ?? 0} incorrect={incorrectCount ?? 0} />
+                    <CorrectIncorrectBar
+                      correct={correctCount ?? 0}
+                      incorrect={incorrectCount ?? 0}
+                      missed={missedCount ?? 0}
+                    />
                   </div>
                 </div>
               </div>

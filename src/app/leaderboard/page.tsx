@@ -88,7 +88,10 @@ export default function LeaderboardPage() {
             </button>
           ))}
         </div>
-        <p className="text-sm text-white/40">Accuracy % is based on correct to incorrect picks ratio - players&apos; win-rate</p>
+        <p className="text-sm text-white/40">
+          Accuracy % is correct picks over every game that has kicked off - skipping a game counts against you, the same as
+          getting it wrong
+        </p>
       </Reveal>
 
       {!entries ? (
