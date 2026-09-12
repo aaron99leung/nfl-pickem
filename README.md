@@ -13,9 +13,9 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 
 - Sign up with email/password or Google, then pick a winner for any upcoming game
 - Picks lock automatically at kickoff - no changing your mind once a game starts (time conversion is in progress)
-- Once a game finishes, picks are graded automatically and roll up into per-user stats: correct/incorrect picks, current streak, longest streak, and accuracy
+- Once a game finishes, picks are graded automatically and roll up into per-user stats: correct/incorrect picks, missed games, current streak, longest streak, and accuracy
 - A public leaderboard ranks every player by accuracy, current streak, or longest streak
-- User profile page shows a statistics dashboard: full pick history heatmap, a weekly accuracy trend chart, and a breakdown of win-rate
+- User profile page shows a statistics dashboard: a pick history heatmap covering every game in the season, a weekly accuracy trend chart, and a breakdown of correct, incorrect and missed picks
 - The full NFL schedule and finals scores are kept in sync automatically - no one has to enter game data by hand
 
 ## Tech stack
@@ -42,6 +42,7 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 - **Pick submission with kickoff locking** - the API rejects a pick the moment a game's kickoff time has passed, checked server-side, not just hidden in the UI
 - **Automatic grading** - A prediction's result is derived on read by comparing the pick against the game's final score
 - **Streaks & accuracy** - current streak, longest streak (with its squares highlighted yellow on the profile's pick-history heatmap), and accuracy; all computed from the same underlying grading logic shared between the profile page and the leaderboard
+- **Missed games count against you** - accuracy is correct picks over every game that has kicked off, not over the games a player chose to pick. Without this, someone who picked a single game correctly and skipped the rest sat on 100% and topped the table. Ranking by a rate players can opt into rewards cherry-picking, so the denominator became every game they had the chance to pick; a skipped game breaks a streak exactly like a wrong pick does
 - **Leaderboard** - accuracy is ranked by default; but can be ordered by current streak, or longest streak; no auth requirement, since standings are meant to be public
 - **Season-aware labels** - pages display the current season, derived from real game data rather than hardcoded per page
 - **Scheduled data sync** - a cron-triggered route auto re-syncs the current and previous week's games daily in case of late game entries
@@ -58,10 +59,11 @@ Vercel Cron (daily)
     → upsert into the Game table (score, status, kickoff time)
 
 User visits their profile / the leaderboard
-  → getGameResultsForUser() joins each Prediction with its Game
+  → getGameResultsForUser() walks every Game and attaches that user's Prediction, if they made one
     → compares pickedTeamId against the winning team
-    → returns each pick as "correct" / "incorrect" / "scheduled" / "cancelled"
-  → computeStats() reduces pick results into currentStreak / longestStreak / accuracy
+    → returns each game as "correct" / "incorrect" / "missed" /
+      "scheduled" / "unpicked" / "cancelled"
+  → computeStats() reduces the graded results into currentStreak / longestStreak / accuracy
 ```
 
 A few decisions worth calling out:
@@ -69,7 +71,7 @@ A few decisions worth calling out:
 - **Grading isn't stored - it's computed on every read.** A `Prediction` row only ever stores which team the user picked. Whether that pick was correct is derived at request time from the linked `Game`'s final score. This avoids ever having a prediction and a grade fall out of sync, at the cost of a bit more computation per request
 - **The ESPN integration is isolated to one file.** ESPN doesn't offer an official public API - the scoreboard endpoint used here is unofficial and undocumented. It is contained in `src/lib/espn.ts`; nothing else in the app touches ESPN's response shape directly, so if the endpoint ever changes, only one file needs to change
 - **The cron route only re-syncs two weeks, not the whole season.** A full-season backfill makes 18 sequential API calls - too slow for a serverless function with a short timeout. The daily cron job instead re-syncs just the current week and the one before it (to catch any late-finishing games), which is enough to keep live scores accurate without re-checking weeks that are already final
-- **Streak highlighting has to survive gaps.** The pick-history heatmap needs to highlight the user's longest streak, but the "longest streak" is computed only over graded (correct/incorrect) picks - scheduled and cancelled games sit in between them in the real chronological sequence. The API translates streak indices from the graded-only subsequence back into indices on the full game list, so the highlight lands on the right games even with gaps
+- **Streak highlighting has to survive gaps.** The pick-history heatmap needs to highlight the user's longest streak, but the "longest streak" is computed only over graded (correct/incorrect/missed) games - scheduled, unpicked and cancelled games sit in between them in the real chronological sequence. The API translates streak indices from the graded-only subsequence back into indices on the full game list, so the highlight lands on the right games even with gaps
 
 ## Local Set Up
 
@@ -115,6 +117,7 @@ npm run dev
 - **Designing around eventual consistency** - Game results, and therefore grading, change on ESPN's schedule, not the user's. Computing grades on read instead of storing them turned out to be simpler to reason about than trying to keep a cached "correct/incorrect" field in sync via webhooks or triggers
 - **Serverless functions have real constraints.** A naive "resync the whole season" cron job would run 18 sequential external API calls - comfortably past a serverless function's timeout. Scoping the cron job to just the current and previous week was a direct optimised response to that constraint
 - **Breaking a circular dependency into sequential steps** - adopting Prisma 7 while wiring up Better Auth created a real chicken-and-egg problem: Better Auth's CLI needed a working Prisma client to generate the `User` model, but Prisma couldn't generate a working client until `User` existed, since `Prediction` already referenced it. Temporarily isolating that one relation broke the cycle - generate the client, let Better Auth fill in the missing model, then restore the relation
+- **A metric can be correct and still be wrong.** Accuracy was computed exactly as specified and still produced a nonsense leaderboard once real players joined, because a player who picks two games and skips the other two hundred is measured on a denominator they chose. The fix was not better maths but a different question - "of the games you could have picked, how many did you get right" - which meant flipping the query from the user's predictions to the full fixture list. Watching real people use it surfaced that in a week; no amount of testing my own account would have
 
 ## Roadmap
 
