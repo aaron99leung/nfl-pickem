@@ -1,54 +1,58 @@
 import { prisma } from "@/lib/prisma";
-import type { GradedPick } from "@/lib/stats";
+import { toGradedPicks, type GradedPick, type PickStatus } from "@/lib/stats";
 
 export type GameResult = {
   gameId: string;
   week: number;
   season: number;
   kickoffAt: Date;
-  status: "correct" | "incorrect" | "scheduled" | "cancelled";
+  status: PickStatus;
   homeTeamAbbreviation: string;
   awayTeamAbbreviation: string;
 };
 
 export async function getGameResultsForUser(userId: string): Promise<GameResult[]> {
-  const predictions = await prisma.prediction.findMany({
-    where: { userId },
+  const games = await prisma.game.findMany({
     include: {
-      game: { include: { homeTeam: true, awayTeam: true } },
+      homeTeam: true,
+      awayTeam: true,
+      predictions: { where: { userId } },
     },
-    orderBy: { game: { kickoffAt: "asc" } },
+    orderBy: { kickoffAt: "asc" },
   });
 
-  return predictions
-    .filter((p) => p.game.status !== "FINAL" || p.game.homeScore !== p.game.awayScore)
-    .map((p) => {
-      let status: GameResult["status"];
-      if (p.game.status === "CANCELLED") {
-        status = "cancelled";
-      } else if (p.game.status === "SCHEDULED") {
-        status = "scheduled";
-      } else {
-        const winnerTeamId =
-          p.game.homeScore! > p.game.awayScore! ? p.game.homeTeamId : p.game.awayTeamId;
-        status = p.pickedTeamId === winnerTeamId ? "correct" : "incorrect";
-      }
+  const now = new Date();
 
-      return {
-        gameId: p.gameId,
-        week: p.game.week,
-        season: p.game.season,
-        kickoffAt: p.game.kickoffAt,
-        status,
-        homeTeamAbbreviation: p.game.homeTeam.abbreviation,
-        awayTeamAbbreviation: p.game.awayTeam.abbreviation,
-      };
-    });
+  return games.map((game) => {
+    const prediction = game.predictions[0];
+    const isTie = game.status === "FINAL" && game.homeScore === game.awayScore;
+
+    let status: PickStatus;
+    if (game.status === "CANCELLED" || isTie) {
+      status = "cancelled";
+    } else if (!prediction) {
+      status = game.kickoffAt <= now ? "missed" : "unpicked";
+    } else if (game.status === "SCHEDULED") {
+      status = "scheduled";
+    } else {
+      const winnerTeamId =
+        game.homeScore! > game.awayScore! ? game.homeTeamId : game.awayTeamId;
+      status = prediction.pickedTeamId === winnerTeamId ? "correct" : "incorrect";
+    }
+
+    return {
+      gameId: game.id,
+      week: game.week,
+      season: game.season,
+      kickoffAt: game.kickoffAt,
+      status,
+      homeTeamAbbreviation: game.homeTeam.abbreviation,
+      awayTeamAbbreviation: game.awayTeam.abbreviation,
+    };
+  });
 }
 
 export async function getGradedPicksForUser(userId: string): Promise<GradedPick[]> {
   const results = await getGameResultsForUser(userId);
-  return results
-    .filter((r) => r.status === "correct" || r.status === "incorrect")
-    .map((r) => ({ correct: r.status === "correct" }));
+  return toGradedPicks(results);
 }

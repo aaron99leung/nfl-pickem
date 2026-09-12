@@ -71,3 +71,19 @@ export function findLongestStreakRange(
   if (bestLength === 0) return null;
   return { startIndex: bestStart, endIndex: bestEnd };
 }
+
+export type PickStatus =
+  | "correct"
+  | "incorrect"
+  | "missed"
+  | "scheduled"
+  | "unpicked"
+  | "cancelled";
+
+export function isGraded(status: PickStatus): boolean {
+  return status === "correct" || status === "incorrect" || status === "missed";
+}
+
+export function toGradedPicks(results: { status: PickStatus }[]): GradedPick[] {
+  return results.filter((r) => isGraded(r.status)).map((r) => ({ correct: r.status === "correct" }));
+}

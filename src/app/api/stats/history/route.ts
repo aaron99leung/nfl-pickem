@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { getGameResultsForUser } from "@/lib/grading";
-import { findLongestStreakRange } from "@/lib/stats";
+import { findLongestStreakRange, isGraded } from "@/lib/stats";
 
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   const gradedIndices: number[] = [];
   const gradedPicks = games.reduce<{ correct: boolean }[]>((acc, game, i) => {
-    if (game.status === "correct" || game.status === "incorrect") {
+    if (isGraded(game.status)) {
       gradedIndices.push(i);
       acc.push({ correct: game.status === "correct" });
     }
