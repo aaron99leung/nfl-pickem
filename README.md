@@ -7,7 +7,12 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 ![Home page](docs/screenshots/home.png)
 ![Game and Team page](docs/screenshots/picks.gif)
 
-<!-- Add: games page with a pick made, profile stats, leaderboard -->
+<p>
+  <img src="docs/screenshots/picks.png" alt="Games page with picks, results and locked games" width="32%" />
+  <!-- Row of 3. Waiting on more finals before capturing the other two.
+       Add them here as siblings, each width="32%", in this order:
+       profile stats  ->  leaderboard -->
+</p>
 
 ## Features
 

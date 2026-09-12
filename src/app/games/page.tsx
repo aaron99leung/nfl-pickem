@@ -18,6 +18,7 @@ export default function GamesPage() {
   const [week, setWeek] = useState<number | null>(null);
   const [games, setGames] = useState<Game[] | null>(null);
   const [pickedTeamByGameId, setPickedTeamByGameId] = useState<Record<string, string>>({});
+  const [picksLoaded, setPicksLoaded] = useState(false);
   const { data: session } = authClient.useSession();
 
   const hasSession = !!session;
@@ -26,6 +27,7 @@ export default function GamesPage() {
     setTrackedHasSession(hasSession);
     if (!hasSession) {
       setPickedTeamByGameId({});
+      setPicksLoaded(false);
     }
   }
 
@@ -49,6 +51,7 @@ export default function GamesPage() {
           map[prediction.gameId] = prediction.pickedTeamId;
         }
         setPickedTeamByGameId(map);
+        setPicksLoaded(true);
       });
   }, [session]);
 
@@ -108,6 +111,7 @@ export default function GamesPage() {
                 <GameBox
                   game={game}
                   pickedTeamId={pickedTeamByGameId[game.id]}
+                  picksLoaded={picksLoaded}
                   onPick={session ? handlePick : undefined}
                   onClear={session ? handleClearPick : undefined}
                 />

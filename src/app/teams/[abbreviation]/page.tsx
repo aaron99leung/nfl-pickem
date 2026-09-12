@@ -15,6 +15,7 @@ export default function TeamSchedulePage({
   const { abbreviation } = use(params);
   const [games, setGames] = useState<Game[] | null>(null);
   const [pickedTeamByGameId, setPickedTeamByGameId] = useState<Record<string, string>>({});
+  const [picksLoaded, setPicksLoaded] = useState(false);
   const { data: session } = authClient.useSession();
 
   const hasSession = !!session;
@@ -23,6 +24,7 @@ export default function TeamSchedulePage({
     setTrackedHasSession(hasSession);
     if (!hasSession) {
       setPickedTeamByGameId({});
+      setPicksLoaded(false);
     }
   }
 
@@ -42,6 +44,7 @@ export default function TeamSchedulePage({
           map[prediction.gameId] = prediction.pickedTeamId;
         }
         setPickedTeamByGameId(map);
+        setPicksLoaded(true);
       });
   }, [session]);
 
@@ -107,6 +110,7 @@ export default function TeamSchedulePage({
                 <GameBox
                   game={game}
                   pickedTeamId={pickedTeamByGameId[game.id]}
+                  picksLoaded={picksLoaded}
                   onPick={session ? handlePick : undefined}
                   onClear={session ? handleClearPick : undefined}
                 />

@@ -19,11 +19,13 @@ function formatKickoff(iso: string) {
 export function GameBox({
   game,
   pickedTeamId,
+  picksLoaded = false,
   onPick,
   onClear,
 }: {
   game: Game;
   pickedTeamId?: string;
+  picksLoaded?: boolean;
   onPick?: (gameId: string, teamId: string) => Promise<void>;
   onClear?: (gameId: string) => Promise<void>;
 }) {
@@ -48,6 +50,8 @@ export function GameBox({
         : null
     : null;
   const isCorrect = pickedTeamId && winningTeamId ? pickedTeamId === winningTeamId : null;
+  const isTie = hasScore && winningTeamId === null;
+  const isMissed = picksLoaded && !pickedTeamId && kickoffPassed && !isCancelled && !isTie;
 
   const home = TEAM_COLORS[game.homeTeam.abbreviation];
   const away = TEAM_COLORS[game.awayTeam.abbreviation];
@@ -115,7 +119,15 @@ export function GameBox({
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           )}
-          {isCorrect ? "Correct" : "Missed"}
+          {isCorrect ? "Correct" : "Incorrect"}
+        </div>
+      )}
+      {isMissed && (
+        <div className="absolute -top-2.5 right-4 z-[5] flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-950 shadow-md">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14" />
+          </svg>
+          Missed
         </div>
       )}
       {isCorrect === null && isPending && (
