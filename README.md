@@ -10,7 +10,7 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 <p>
   <img src="docs/screenshots/picks.png" alt="Games page with picks, results and locked games" width="32%" />
   <img src="docs/screenshots/leaderboard.png" alt="Public Leaderboard with each users' stats" width="32%" />
-  <img src="docs/screenshots/profilestats.png" alt="User's private profiles with statistics" width="32%" />
+  <img src="docs/screenshots/profile-stats.png" alt="User's private profiles with statistics" width="32%" />
 </p>
 
 ## Features
