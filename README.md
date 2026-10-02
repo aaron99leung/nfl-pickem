@@ -9,9 +9,8 @@ A full-stack NFL predictions app: pick a winner for every game, build a streak, 
 
 <p>
   <img src="docs/screenshots/picks.png" alt="Games page with picks, results and locked games" width="32%" />
-  <!-- Row of 3. Waiting on more finals before capturing the other two.
-       Add them here as siblings, each width="32%", in this order:
-       profile stats  ->  leaderboard -->
+  <img src="docs/screenshots/leaderboard.png" alt="Public Leaderboard with each users' stats" width="32%" />
+  <img src="docs/screenshots/profilestats.png" alt="User's private profiles with statistics" width="32%" />
 </p>
 
 ## Features
